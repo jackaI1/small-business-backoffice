@@ -1,0 +1,16 @@
+{
+  "id": "POP-BANK-H1",
+  "control_id": "C-BANK",
+  "period_start": "2026-01-01",
+  "period_end": "2026-06-30",
+  "source": "Northstar fictional monthly close register",
+  "reconciliation": "The six rows below match the six monthly bank reconciliation tasks in the January to June close calendar.",
+  "items": [
+    {"id": "BANK-01", "date": "2026-01-28", "description": "January bank reconciliation"},
+    {"id": "BANK-02", "date": "2026-02-28", "description": "February bank reconciliation"},
+    {"id": "BANK-03", "date": "2026-03-28", "description": "March bank reconciliation"},
+    {"id": "BANK-04", "date": "2026-04-28", "description": "April bank reconciliation"},
+    {"id": "BANK-05", "date": "2026-05-28", "description": "May bank reconciliation"},
+    {"id": "BANK-06", "date": "2026-06-28", "description": "June bank reconciliation"}
+  ]
+}

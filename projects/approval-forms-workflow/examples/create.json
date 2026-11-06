@@ -1,0 +1,13 @@
+{
+  "operation": "create",
+  "actor": {
+    "id": "requester-1",
+    "role": "REQUESTER"
+  },
+  "form": {
+    "id": "LAB-001",
+    "title": "Shared lab supplies",
+    "type": "purchase",
+    "amount": "6000.00"
+  }
+}

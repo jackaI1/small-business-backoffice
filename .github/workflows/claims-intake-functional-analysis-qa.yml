@@ -1,0 +1,41 @@
+name: claims-intake-functional-analysis / Intake QA
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - projects/claims-intake-functional-analysis/**
+    - .github/workflows/claims-intake-functional-analysis-qa.yml
+  pull_request:
+    paths:
+    - projects/claims-intake-functional-analysis/**
+    - .github/workflows/claims-intake-functional-analysis-qa.yml
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  requirements:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        python:
+        - '3.9'
+        - '3.13'
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Execute tests and requirement report
+      run: python scripts/run_qa.py
+    - name: Check committed evidence matches the executed results
+      run: git diff --exit-code -- reports/
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: qa-python-${{ matrix.python }}
+        path: projects/claims-intake-functional-analysis/reports/
+defaults:
+  run:
+    working-directory: projects/claims-intake-functional-analysis

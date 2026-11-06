@@ -1,0 +1,5 @@
+id,product,sex,issue_age,count,benefit,annual_premium,term
+term_30_m,term,male,30,1000,100000,500,20
+term_50_f,term,female,50,750,100000,650,20
+whole_35_f,whole_life,female,35,500,100000,1400,
+whole_55_m,whole_life,male,55,250,100000,3300,

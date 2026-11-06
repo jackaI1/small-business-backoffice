@@ -1,0 +1,4 @@
+region_id,region_name,handling_minutes,paid_hours,shrinkage,occupancy,available_headcount
+CA,Canada,12,8,0.30,0.85,13
+UK,United Kingdom,15,8,0.25,0.85,12
+AU,Australia,14,8,0.28,0.85,9

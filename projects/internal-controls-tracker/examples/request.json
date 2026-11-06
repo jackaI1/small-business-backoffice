@@ -1,0 +1,8 @@
+{
+  "id": "AR-BANK-01",
+  "control_id": "C-BANK",
+  "description": "Provide the June bank statement, reconciliation and dated independent approval",
+  "owner": "Controller",
+  "due": "2026-07-10",
+  "requested_by": "Internal reviewer"
+}

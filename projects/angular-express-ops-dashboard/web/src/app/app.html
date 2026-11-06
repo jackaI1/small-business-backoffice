@@ -1,0 +1,88 @@
+<header class="masthead">
+  <span class="wordmark">Ops / production</span>
+  <a href="/venue/">Venue shiftboard</a>
+  <span class="demo-label">Fictional sample data</span>
+</header>
+<main>
+  <div class="intro">
+    <h1>Production overview</h1>
+    <p>Find where output slows down and how many units need to be rejected.</p>
+    <p class="sample-note">The demo contains 180 runs across three lines, from October 1 to 30, 2026.</p>
+  </div>
+  <form class="filters" (ngSubmit)="applyFilters()" aria-label="Filter production runs">
+    <label>From <input name="from" type="date" [(ngModel)]="filters.from"></label>
+    <label>Through <input name="to" type="date" [(ngModel)]="filters.to"></label>
+    <label>Production line
+      <select aria-label="Production line" name="line" [(ngModel)]="filters.line">
+        <option value="">All lines</option><option value="alpha">Line A</option><option value="beta">Line B</option><option value="gamma">Line C</option>
+      </select>
+    </label>
+    <label>Run status
+      <select aria-label="Run status" name="status" [(ngModel)]="filters.status">
+        <option value="">All statuses</option><option value="complete">Complete</option><option value="delayed">Delayed</option>
+      </select>
+    </label>
+    <button type="submit" [disabled]="loading()">Apply filters</button>
+    <button class="quiet" type="button" (click)="resetFilters()" [disabled]="loading()">Reset</button>
+  </form>
+  @if (loading()) {
+    <p role="status" class="notice">Loading production runs…</p>
+  }
+  @if (error()) {
+    <div role="alert" class="notice error">
+      <p>{{ error() }}</p>
+      <button type="button" data-testid="retry" (click)="retry()">Try again</button>
+    </div>
+  }
+  @if (dashboard(); as data) {
+    <section aria-label="Totals for all matching runs" class="totals">
+      <div><span>Good units</span><strong>{{ data.summary.good | number }}</strong><small>{{ data.summary.produced | number }} produced / {{ data.summary.planned | number }} planned</small></div>
+      <div><span>Rejected units</span><strong>{{ data.summary.rejected | number }}</strong><small>@if (data.summary.rejectionRate !== null) { {{ data.summary.rejectionRate | number:'1.0-2' }}% of produced units } @else { No output }</small></div>
+      <div><span>Downtime</span><strong>{{ data.summary.downtimeMinutes | number }} <em>min</em></strong><small>Total time stopped</small></div>
+      <div><span>Matching runs</span><strong>{{ data.summary.runs | number }}</strong><small>Totals include every matching page</small></div>
+    </section>
+    @if (data.summary.runs === 0) {
+      <div class="notice"><h2>No runs match these filters</h2><p>Reset the filters or choose dates in October 2026 to explore the sample runs.</p></div>
+    } @else {
+      <div class="analysis-grid">
+        <section class="panel" data-testid="line-totals">
+          <h2>Output by line</h2>
+          <p>Compare produced units across the selected runs.</p>
+          @for (line of data.lines; track line.line) {
+            <div class="line-result">
+              <div class="line-heading"><strong>{{ lineNames[line.line] }}</strong><span>{{ line.produced | number }} units</span></div>
+              <div class="bar-track" aria-hidden="true"><div class="bar" [style.width.%]="line.produced / chartMax() * 100"></div></div>
+              <p>{{ line.rejected | number }} rejected / {{ line.downtimeMinutes | number }} min stopped</p>
+            </div>
+          }
+        </section>
+        <section class="panel" data-testid="daily-totals">
+          <h2>Daily output</h2>
+          <p>Each day's totals across all matching runs.</p>
+          <div class="daily-scroll" tabindex="0" role="region" aria-label="Daily output table, scroll for more days">
+            <table><thead><tr><th scope="col">Date</th><th scope="col" class="numeric">Produced</th><th scope="col" class="numeric">Rejected</th></tr></thead>
+              <tbody>@for (day of data.trends; track day.date) {<tr><th scope="row">{{ day.date }}</th><td class="numeric">{{ day.produced | number }}</td><td class="numeric">{{ day.rejected | number }}</td></tr>}</tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    }
+    <section class="records">
+      <div class="section-heading"><div><h2>Production runs</h2><p>Inspect the records behind the totals. Newest runs appear first.</p></div><span>{{ data.runs.total | number }} records</span></div>
+      <p class="scroll-hint">Scroll sideways to see output and downtime.</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Production runs table, scroll horizontally for all columns">
+        <table>
+          <thead><tr><th scope="col">Run</th><th scope="col">Date</th><th scope="col">Line</th><th scope="col">Shift</th><th scope="col">Status</th><th scope="col" class="numeric">Planned</th><th scope="col" class="numeric">Produced</th><th scope="col" class="numeric">Rejected</th><th scope="col" class="numeric">Downtime (min)</th></tr></thead>
+          <tbody>@for (run of data.runs.data; track run.id) {
+            <tr data-testid="run-row"><td>{{ run.id }}</td><th scope="row">{{ run.date }}</th><td>{{ lineNames[run.line] }}</td><td class="capitalize">{{ run.shift }}</td><td><span class="status" [class.delayed]="run.status === 'delayed'">{{ run.status === 'delayed' ? 'Delayed' : 'Complete' }}</span></td><td class="numeric">{{ run.planned | number }}</td><td class="numeric">{{ run.produced | number }}</td><td class="numeric">{{ run.rejected | number }}</td><td class="numeric">{{ run.downtimeMinutes | number }}</td></tr>
+          }</tbody>
+        </table>
+      </div>
+      <nav class="pagination" aria-label="Production run pages">
+        <span>@if (data.runs.totalPages) { Page {{ data.runs.page }} of {{ data.runs.totalPages }} } @else { 0 records }</span>
+        <div><button type="button" class="quiet" data-testid="previous" [disabled]="data.runs.page <= 1" (click)="changePage(-1)">Previous</button><button type="button" class="quiet" data-testid="next" [disabled]="data.runs.page >= data.runs.totalPages" (click)="changePage(1)">Next</button></div>
+      </nav>
+    </section>
+  }
+  <footer>Sample runs are generated from a fixed recipe. They do not describe a real facility.</footer>
+</main>

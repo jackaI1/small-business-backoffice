@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Northfield service desk</title><link rel="stylesheet" href="/static/style.css"><script src="/static/resident.js" defer></script></head>
+<body><header><a href="/" class="identity">Northfield <span>Service desk</span></a><nav aria-label="Main"><a href="#track">Track a request</a><a href="/staff">Staff desk</a></nav></header>
+<main><div class="notice">Fictional city, working demo. Use made-up details only. For immediate danger, contact emergency services.</div>
+<div class="intro"><h1>A better place<br>starts with a report.</h1><p>A broken streetlight. A missed bin. Tell the service desk what needs attention, then follow your request as staff review it.</p></div>
+<div class="desk"><section aria-labelledby="request-heading"><h2 id="request-heading">Report a service issue</h2><p>Give staff enough detail to find the issue safely.</p>
+<form id="request-form"><label for="service">What needs attention?</label><select id="service" name="service" required></select>
+<label for="location">Location or nearest intersection</label><input id="location" name="location" required minlength="3" maxlength="200" placeholder="Maple Road at Cedar Street">
+<label for="description">What did you notice?</label><textarea id="description" name="description" required minlength="10" maxlength="2000" rows="4" placeholder="Describe the issue, without personal details."></textarea>
+<label for="contact">Contact detail <span>(optional, visible only to staff)</span></label><input id="contact" name="contact" maxlength="200" placeholder="Use a fictional email in this demo">
+<button type="submit">Send service request</button></form><div id="request-result" role="status" aria-live="polite"></div></section>
+<aside aria-labelledby="faq-heading"><h2 id="faq-heading">Ask the service desk</h2><p>Answers come from our fictional city guides. The assistant shows its source and declines questions it cannot support. Keep personal details out of questions.</p>
+<form id="faq-form"><label for="question">Your question</label><textarea id="question" required minlength="5" maxlength="500" rows="3" placeholder="When should I report missed waste collection?"></textarea><button type="submit" class="secondary">Ask a question</button></form><div id="faq-result" role="status" aria-live="polite"></div><details><summary>Read the city guides</summary><div id="guides"></div></details></aside></div>
+<section id="track" class="tracking"><h2>Follow your request</h2><p>Save the private receipt after sending a request. It reveals the status, without your contact details or staff notes.</p><form id="track-form"><label for="receipt">Private receipt</label><input id="receipt" required minlength="32" maxlength="100" autocomplete="off"><button class="secondary" type="submit">Check status</button></form><div id="track-result" role="status" aria-live="polite"></div></section>
+</main><footer>Northfield is fictional. This is a local service-workflow project by Jack Lai.</footer></body></html>

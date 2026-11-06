@@ -1,0 +1,38 @@
+name: staffing-demand-forecast / Refresh staffing forecast
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - projects/staffing-demand-forecast/**
+    - .github/workflows/staffing-demand-forecast-refresh.yml
+  pull_request:
+    paths:
+    - projects/staffing-demand-forecast/**
+    - .github/workflows/staffing-demand-forecast-refresh.yml
+  workflow_dispatch: {}
+permissions:
+  contents: read
+concurrency:
+  group: staffing-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: astral-sh/setup-uv@v6
+      with:
+        python-version: '3.13'
+        working-directory: projects/staffing-demand-forecast
+    - run: uv sync --frozen
+    - run: uv run staffing-refresh --synthetic --output outputs/latest
+    - uses: actions/upload-artifact@v4
+      with:
+        name: staffing-forecast-${{ github.run_number }}
+        path: projects/staffing-demand-forecast/outputs/latest/
+        retention-days: 30
+    timeout-minutes: 20
+defaults:
+  run:
+    working-directory: projects/staffing-demand-forecast

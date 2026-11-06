@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "life-insurance-projection-lifelib"
+version = "1.0.0"
+description = "Term and whole-life cohort cash flows with an editable Excel report"
+requires-python = ">=3.11"
+dependencies = ["lifelib==0.17.2", "modelx==0.33.0", "numpy>=2.2,<3", "pandas>=2.2,<4", "xlsxwriter>=3.2,<4"]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10", "openpyxl>=3.1,<4"]
+
+[project.scripts]
+insurance-project = "insurance_projection.cli:main"
+
+[tool.setuptools.package-data]
+insurance_projection = ["data/*.csv"]
+
+[tool.setuptools.packages.find]
+include = ["insurance_projection*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

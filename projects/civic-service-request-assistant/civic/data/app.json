@@ -1,0 +1,16 @@
+{
+  "city": "City of Northfield",
+  "services": [
+    {"id": "pothole", "label": "Pothole", "department": "Roads"},
+    {"id": "streetlight", "label": "Streetlight outage", "department": "Roads"},
+    {"id": "waste", "label": "Missed waste collection", "department": "Waste"},
+    {"id": "park", "label": "Park maintenance", "department": "Parks"}
+  ],
+  "transitions": {
+    "submitted": ["approved", "rejected"],
+    "approved": ["in_progress"],
+    "in_progress": ["resolved"],
+    "resolved": [],
+    "rejected": []
+  }
+}

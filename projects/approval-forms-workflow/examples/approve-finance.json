@@ -1,0 +1,9 @@
+{
+  "operation": "action",
+  "formId": "LAB-001",
+  "action": "approve",
+  "actor": {
+    "id": "finance-1",
+    "role": "FINANCE"
+  }
+}

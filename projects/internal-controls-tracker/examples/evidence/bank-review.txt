@@ -1,0 +1,11 @@
+NORTHSTAR COMPONENTS: FICTIONAL TRAINING EVIDENCE
+Occurrence: BANK-06, June 2026 bank reconciliation
+Bank statement ending balance: 10250.00 CAD
+Outstanding payments: 250.00 CAD
+Adjusted bank balance: 10000.00 CAD
+General ledger cash balance: 10000.00 CAD
+Reperformed difference: 0.00 CAD
+Prepared by Accountant: 2026-06-28
+Independent reviewer: Controller
+Review date: absent from the supplied reconciliation
+Tester observation: balance agrees, but approval timing cannot be established.

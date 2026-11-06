@@ -1,0 +1,10 @@
+{
+  "discount_rate": 0.03,
+  "mortality_factor": 1.0,
+  "lapse_first": 0.08,
+  "lapse_renewal": 0.04,
+  "lapse_factor": 1.0,
+  "acquisition": 200.0,
+  "maintenance": 40.0,
+  "inflation": 0.02
+}

@@ -1,0 +1,10 @@
+line,current,comparative
+revenue,41950.00,17200.00
+cost_of_sales,26350.00,11800.00
+gross_profit,15600.00,5400.00
+operating_expense,500.00,1000
+finance_expense,0,0
+tax_expense,3718.500,0
+profit_loss,11381.500,4400.00
+translation_oci,3675.000,0.00
+total_comprehensive_income,15056.500,4400.00

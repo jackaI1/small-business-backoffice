@@ -1,0 +1,157 @@
+[
+  {
+    "claim_ref": "DEMO-C01",
+    "policy_id": "DEMO-P01",
+    "property_id": "DEMO-H01",
+    "loss_date": "2026-01-10",
+    "reported_date": "2026-01-11",
+    "loss_type": "water",
+    "amount_cents": 125000,
+    "description": "Fictional pipe leak",
+    "evidence": [
+      "photos"
+    ]
+  },
+  {
+    "claim_ref": "DEMO-C02",
+    "policy_id": "DEMO-P02",
+    "property_id": "DEMO-H02",
+    "loss_date": "2026-01-10",
+    "reported_date": "2026-01-11",
+    "loss_type": "theft",
+    "amount_cents": 125000,
+    "description": "Fictional pipe leak",
+    "evidence": [
+      "inventory",
+      "police_reference"
+    ]
+  },
+  {
+    "claim_ref": "DEMO-C03",
+    "policy_id": "DEMO-P01",
+    "property_id": "DEMO-H01",
+    "loss_date": "2026-01-10",
+    "reported_date": "2026-01-11",
+    "loss_type": "water",
+    "amount_cents": 125000,
+    "description": "",
+    "evidence": [
+      "photos"
+    ]
+  },
+  {
+    "claim_ref": "DEMO-C04",
+    "policy_id": "DEMO-P01",
+    "property_id": "DEMO-H01",
+    "loss_date": "2026-01-10",
+    "reported_date": "2026-01-11",
+    "loss_type": "water",
+    "amount_cents": 125000,
+    "description": "Fictional pipe leak",
+    "evidence": []
+  },
+  {
+    "claim_ref": "DEMO-C05",
+    "policy_id": "DEMO-UNKNOWN",
+    "property_id": "DEMO-H01",
+    "loss_date": "2026-01-10",
+    "reported_date": "2026-01-11",
+    "loss_type": "water",
+    "amount_cents": 125000,
+    "description": "Fictional pipe leak",
+    "evidence": [
+      "photos"
+    ]
+  },
+  {
+    "claim_ref": "DEMO-C06",
+    "policy_id": "DEMO-P01",
+    "property_id": "DEMO-H99",
+    "loss_date": "2026-01-10",
+    "reported_date": "2026-01-11",
+    "loss_type": "water",
+    "amount_cents": 125000,
+    "description": "Fictional pipe leak",
+    "evidence": [
+      "photos"
+    ]
+  },
+  {
+    "claim_ref": "DEMO-C07",
+    "policy_id": "DEMO-P01",
+    "property_id": "DEMO-H01",
+    "loss_date": "2024-12-31",
+    "reported_date": "2026-01-11",
+    "loss_type": "water",
+    "amount_cents": 125000,
+    "description": "Fictional pipe leak",
+    "evidence": [
+      "photos"
+    ]
+  },
+  {
+    "claim_ref": "DEMO-C08",
+    "policy_id": "DEMO-P01",
+    "property_id": "DEMO-H01",
+    "loss_date": "2026-01-10",
+    "reported_date": "2026-01-09",
+    "loss_type": "water",
+    "amount_cents": 125000,
+    "description": "Fictional pipe leak",
+    "evidence": [
+      "photos"
+    ]
+  },
+  {
+    "claim_ref": "DEMO-C09",
+    "policy_id": "DEMO-P01",
+    "property_id": "DEMO-H01",
+    "loss_date": "2026-01-10",
+    "reported_date": "2026-01-16",
+    "loss_type": "water",
+    "amount_cents": 125000,
+    "description": "Fictional pipe leak",
+    "evidence": [
+      "photos"
+    ]
+  },
+  {
+    "claim_ref": "DEMO-C10",
+    "policy_id": "DEMO-P01",
+    "property_id": "DEMO-H01",
+    "loss_date": "2026-01-10",
+    "reported_date": "2026-01-11",
+    "loss_type": "water",
+    "amount_cents": 2500000,
+    "description": "Fictional pipe leak",
+    "evidence": [
+      "photos"
+    ]
+  },
+  {
+    "claim_ref": "DEMO-C11",
+    "policy_id": "DEMO-P01",
+    "property_id": "DEMO-H01",
+    "loss_date": "2026-01-10",
+    "reported_date": "2026-01-11",
+    "loss_type": "water",
+    "amount_cents": 125000,
+    "description": "Fictional pipe leak",
+    "evidence": [
+      "photos"
+    ]
+  },
+  {
+    "claim_ref": "DEMO-C01",
+    "policy_id": "DEMO-P01",
+    "property_id": "DEMO-H01",
+    "loss_date": "2026-01-10",
+    "reported_date": "2026-01-11",
+    "loss_type": "water",
+    "amount_cents": 125000,
+    "description": "Conflicting fictional account",
+    "evidence": [
+      "photos"
+    ]
+  }
+]

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ifrs-consolidation-model"
+version = "0.1.0"
+description = "Auditable multi-currency consolidation and long-range planning workpapers"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "Jack Lai"}]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
+
+[project.scripts]
+ifrs-close = "ifrs_consolidation.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]

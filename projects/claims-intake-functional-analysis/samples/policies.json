@@ -1,0 +1,4 @@
+[
+  {"policy_id": "DEMO-P01", "property_id": "DEMO-H01", "start_date": "2025-01-01", "end_date": "2026-12-31"},
+  {"policy_id": "DEMO-P02", "property_id": "DEMO-H02", "start_date": "2025-01-01", "end_date": "2026-12-31"}
+]

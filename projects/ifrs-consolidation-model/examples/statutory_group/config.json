@@ -1,0 +1,241 @@
+{
+  "presentation_currency": "CAD",
+  "parent": "CA",
+  "period": "2026-10",
+  "entities": {
+    "CA": {
+      "name": "Maple Parent",
+      "currency": "CAD",
+      "ownership": "1",
+      "opening_cta": "0"
+    },
+    "US": {
+      "name": "Maple US",
+      "currency": "USD",
+      "ownership": "1",
+      "opening_cta": "0"
+    },
+    "EU": {
+      "name": "Maple Europe",
+      "currency": "EUR",
+      "ownership": "1",
+      "opening_cta": "0"
+    },
+    "UK": {
+      "name": "Maple UK",
+      "currency": "GBP",
+      "ownership": "1",
+      "opening_cta": "0"
+    }
+  },
+  "plan_scenarios": [
+    "Base",
+    "Downside"
+  ],
+  "plan_periods": [
+    "2027",
+    "2028",
+    "2029"
+  ],
+  "rates": [
+    {
+      "scenario": "Actual",
+      "period": "2026-10",
+      "currency": "CAD",
+      "closing": "1",
+      "average": "1"
+    },
+    {
+      "scenario": "Base",
+      "period": "2027",
+      "currency": "CAD",
+      "closing": "1",
+      "average": "1"
+    },
+    {
+      "scenario": "Base",
+      "period": "2028",
+      "currency": "CAD",
+      "closing": "1",
+      "average": "1"
+    },
+    {
+      "scenario": "Base",
+      "period": "2029",
+      "currency": "CAD",
+      "closing": "1",
+      "average": "1"
+    },
+    {
+      "scenario": "Downside",
+      "period": "2027",
+      "currency": "CAD",
+      "closing": "1",
+      "average": "1"
+    },
+    {
+      "scenario": "Downside",
+      "period": "2028",
+      "currency": "CAD",
+      "closing": "1",
+      "average": "1"
+    },
+    {
+      "scenario": "Downside",
+      "period": "2029",
+      "currency": "CAD",
+      "closing": "1",
+      "average": "1"
+    },
+    {
+      "scenario": "Actual",
+      "period": "2026-10",
+      "currency": "USD",
+      "closing": "1.25",
+      "average": "1.25"
+    },
+    {
+      "scenario": "Base",
+      "period": "2027",
+      "currency": "USD",
+      "closing": "1.25",
+      "average": "1.25"
+    },
+    {
+      "scenario": "Base",
+      "period": "2028",
+      "currency": "USD",
+      "closing": "1.25",
+      "average": "1.25"
+    },
+    {
+      "scenario": "Base",
+      "period": "2029",
+      "currency": "USD",
+      "closing": "1.25",
+      "average": "1.25"
+    },
+    {
+      "scenario": "Downside",
+      "period": "2027",
+      "currency": "USD",
+      "closing": "1.25",
+      "average": "1.25"
+    },
+    {
+      "scenario": "Downside",
+      "period": "2028",
+      "currency": "USD",
+      "closing": "1.25",
+      "average": "1.25"
+    },
+    {
+      "scenario": "Downside",
+      "period": "2029",
+      "currency": "USD",
+      "closing": "1.25",
+      "average": "1.25"
+    },
+    {
+      "scenario": "Actual",
+      "period": "2026-10",
+      "currency": "EUR",
+      "closing": "1.50",
+      "average": "1.50"
+    },
+    {
+      "scenario": "Base",
+      "period": "2027",
+      "currency": "EUR",
+      "closing": "1.50",
+      "average": "1.50"
+    },
+    {
+      "scenario": "Base",
+      "period": "2028",
+      "currency": "EUR",
+      "closing": "1.50",
+      "average": "1.50"
+    },
+    {
+      "scenario": "Base",
+      "period": "2029",
+      "currency": "EUR",
+      "closing": "1.50",
+      "average": "1.50"
+    },
+    {
+      "scenario": "Downside",
+      "period": "2027",
+      "currency": "EUR",
+      "closing": "1.50",
+      "average": "1.50"
+    },
+    {
+      "scenario": "Downside",
+      "period": "2028",
+      "currency": "EUR",
+      "closing": "1.50",
+      "average": "1.50"
+    },
+    {
+      "scenario": "Downside",
+      "period": "2029",
+      "currency": "EUR",
+      "closing": "1.50",
+      "average": "1.50"
+    },
+    {
+      "scenario": "Actual",
+      "period": "2026-10",
+      "currency": "GBP",
+      "closing": "1.75",
+      "average": "1.75"
+    },
+    {
+      "scenario": "Base",
+      "period": "2027",
+      "currency": "GBP",
+      "closing": "1.75",
+      "average": "1.75"
+    },
+    {
+      "scenario": "Base",
+      "period": "2028",
+      "currency": "GBP",
+      "closing": "1.75",
+      "average": "1.75"
+    },
+    {
+      "scenario": "Base",
+      "period": "2029",
+      "currency": "GBP",
+      "closing": "1.75",
+      "average": "1.75"
+    },
+    {
+      "scenario": "Downside",
+      "period": "2027",
+      "currency": "GBP",
+      "closing": "1.75",
+      "average": "1.75"
+    },
+    {
+      "scenario": "Downside",
+      "period": "2028",
+      "currency": "GBP",
+      "closing": "1.75",
+      "average": "1.75"
+    },
+    {
+      "scenario": "Downside",
+      "period": "2029",
+      "currency": "GBP",
+      "closing": "1.75",
+      "average": "1.75"
+    }
+  ],
+  "formation_only": true,
+  "services_fully_consumed": true,
+  "average_rates_appropriate": true
+}
