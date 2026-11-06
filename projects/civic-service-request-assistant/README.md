@@ -72,7 +72,8 @@ This demo deliberately permits only local model and export endpoints. It has a s
 
 ## Tests and limits
 
-There are 4 test source files in this copy. No test pass count is claimed here: I have not re-run the project suite as part of this move. This is a source snapshot, and running it on a new machine may need environment-specific setup.
+There are 4 test source files in this copy. That source count does not establish an execution result. This is a source snapshot, and running it on a new machine may need environment-specific setup.
 
 
-Project checks run from this directory through the path-filtered hub workflows: `civic-service-request-assistant-ci.yml`.
+
+Retained project workflows: `civic-service-request-assistant-ci.yml`. Their commands use this folder and their triggers use its paths.

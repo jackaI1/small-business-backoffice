@@ -30,9 +30,10 @@ The command line reads a JSON file, a plain text format for structured records. 
 
 ## Tests and limits
 
-There are 3 test source files in this copy. No test pass count is claimed here: I have not re-run the project suite as part of this move. This is a source snapshot, and running it on a new machine may need environment-specific setup.
+There are 3 test source files in this copy. That source count does not establish an execution result. This is a source snapshot, and running it on a new machine may need environment-specific setup.
 
 
-Project checks run from this directory through the path-filtered hub workflows: `claims-intake-functional-analysis-qa.yml`.
 
 Generated output omitted: reports/ (generated output).
+
+Retained project workflows: `claims-intake-functional-analysis-qa.yml`. Their commands use this folder and their triggers use its paths.

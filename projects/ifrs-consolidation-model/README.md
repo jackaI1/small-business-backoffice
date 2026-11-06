@@ -32,3 +32,5 @@ python -m pytest -q
 ```
 
 This is a simplified group model. It does not automatically handle acquisitions, goodwill or minority ownership, and its generated report is not an audited or filed statement pack.
+
+Retained project workflows: `ifrs-consolidation-model-ci.yml`. Their commands use this folder and their triggers use its paths.
