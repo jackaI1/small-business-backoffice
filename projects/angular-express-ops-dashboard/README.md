@@ -32,7 +32,7 @@ This is a local demonstration with deterministic sample data, not a live venue m
 
 ## Tests and limits
 
-There are 6 test source files in this copy. That source count does not establish an execution result. This is a source snapshot, and running it on a new machine may need environment-specific setup.
+I kept 7 files of test code and supporting test helpers in this copy. That source count does not establish an execution result. This is a source snapshot, and running it on a new machine may need environment-specific setup.
 
 
 
