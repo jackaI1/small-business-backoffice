@@ -1,0 +1,56 @@
+name: wp-membership-demo
+services:
+  db:
+    image: mariadb:11.4
+    environment:
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: local-demo-only
+      MARIADB_ROOT_PASSWORD: local-root-only
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+  wordpress:
+    image: wordpress:6.8.3-php8.2-apache
+    ports:
+      - '127.0.0.1:${WP_PORT:-8080}:80'
+    environment: &wp-environment
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: local-demo-only
+      WORDPRESS_DB_NAME: wordpress
+      WPMM_DEMO_SMTP: '1'
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_ENVIRONMENT_TYPE', 'local');
+        define('DISALLOW_FILE_EDIT', true);
+    volumes: &wp-volumes
+      - wordpress:/var/www/html
+      - ./:/var/www/html/wp-content/plugins/wp-membership-manager:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+  cli:
+    image: wordpress:cli-php8.2
+    entrypoint: [wp]
+    user: '33:33'
+    environment: *wp-environment
+    volumes: *wp-volumes
+    depends_on:
+      db:
+        condition: service_healthy
+      wordpress:
+        condition: service_started
+    profiles: [tools]
+  mailpit:
+    image: axllent/mailpit:v1.27.8
+    ports:
+      - '127.0.0.1:${MAILPIT_PORT:-8025}:8025'
+volumes:
+  db:
+  wordpress:

@@ -1,0 +1,15 @@
+id,account,date,amount,currency,reference
+B001,operating-cad,2026-10-02,12000.00,CAD,INV-100
+B002,operating-cad,2026-10-06,-4000.00,CAD,PAY-100
+B003,operating-cad,2026-10-10,-1500.00,CAD,RENT-OCT
+B004,operating-cad,2026-10-12,-1025.00,CAD,VENDOR-X
+B005,operating-cad,2026-10-31,-35.00,CAD,BANK-FEE
+B006,operating-cad,2026-10-21,500.00,CAD,
+B007,operating-cad,2026-10-24,-200.00,CAD,DUP-200
+B008,operating-usd,2026-10-04,3000.00,USD,US-INV-10
+B009,operating-usd,2026-10-09,-900.00,USD,US-VENDOR
+B010,operating-usd,2026-10-31,-15.00,USD,US-FEE
+B011,reserve-cad,2026-10-15,2000.00,CAD,TRANSFER-15
+B012,operating-cad,2026-10-15,-2000.00,CAD,TRANSFER-15
+B013,operating-cad,2026-10-30,800.00,CAD,MONTH-END
+B014,operating-cad,2026-11-02,700.00,CAD,FUTURE

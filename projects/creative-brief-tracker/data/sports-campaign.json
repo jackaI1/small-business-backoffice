@@ -1,0 +1,29 @@
+{
+  "assignees": [
+    {"key": "avery", "name": "Avery Demo", "email": "avery@example.test", "capacity_hours": 8},
+    {"key": "morgan", "name": "Morgan Demo", "email": "morgan@example.test", "capacity_hours": 12},
+    {"key": "riley", "name": "Riley Demo", "email": "riley@example.test", "capacity_hours": 6}
+  ],
+  "briefs": [
+    {
+      "key": "home-opener", "name": "Home opener campaign", "due": "2026-11-13",
+      "description": "Fictional Harbour Hawks basketball campaign. Poster, social tile and arena screen. Audience: students. Message: opening night tickets. All people and campaign details are synthetic.",
+      "steps": [
+        {"key": "copy", "name": "Ticket message and copy", "assignee": "morgan", "days": 2, "hours": 4},
+        {"key": "design", "name": "Poster and social artwork", "assignee": "avery", "days": 3, "hours": 12},
+        {"key": "review", "name": "Creative lead approval", "assignee": "riley", "days": 1, "hours": 2, "approval": true},
+        {"key": "export", "name": "Final arena screen exports", "assignee": "avery", "days": 1, "hours": 4}
+      ]
+    },
+    {
+      "key": "rivalry-night", "name": "Rivalry night campaign", "due": "2026-11-16",
+      "description": "Fictional Harbour Hawks rivalry night. Deliver a ticket email header and two social tiles with a clear ticket link.",
+      "steps": [
+        {"key": "copy", "name": "Rivalry night headline", "assignee": "morgan", "days": 1, "hours": 4},
+        {"key": "design", "name": "Email header and social tiles", "assignee": "avery", "days": 2, "hours": 12},
+        {"key": "review", "name": "Campaign approval", "assignee": "riley", "days": 1, "hours": 2, "approval": true},
+        {"key": "export", "name": "Final ticket campaign exports", "assignee": "avery", "days": 1, "hours": 4}
+      ]
+    }
+  ]
+}

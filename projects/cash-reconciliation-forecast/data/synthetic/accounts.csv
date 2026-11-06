@@ -1,0 +1,4 @@
+account,currency,balance_date,bank_opening,ledger_opening
+operating-cad,CAD,2026-07-31,30000.00,30000.00
+reserve-cad,CAD,2026-07-31,10000.00,10000.00
+operating-usd,USD,2026-07-31,8000.00,8000.00

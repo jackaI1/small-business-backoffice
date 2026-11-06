@@ -1,0 +1,73 @@
+{
+  "presentation_currency": "CAD",
+  "parent": "CA",
+  "period": "2024-10",
+  "entities": {
+    "CA": {
+      "name": "Maple Parent",
+      "currency": "CAD",
+      "ownership": "1",
+      "opening_cta": "0"
+    },
+    "US": {
+      "name": "Maple US",
+      "currency": "USD",
+      "ownership": "1",
+      "opening_cta": "0"
+    },
+    "EU": {
+      "name": "Maple Europe",
+      "currency": "EUR",
+      "ownership": "1",
+      "opening_cta": "0"
+    },
+    "UK": {
+      "name": "Maple UK",
+      "currency": "GBP",
+      "ownership": "1",
+      "opening_cta": "0"
+    }
+  },
+  "plan_scenarios": [
+    "Base",
+    "Downside"
+  ],
+  "plan_periods": [
+    "2027",
+    "2028",
+    "2029"
+  ],
+  "rates": [
+    {
+      "scenario": "Actual",
+      "period": "2024-10",
+      "currency": "CAD",
+      "average": "1",
+      "closing": "1"
+    },
+    {
+      "scenario": "Actual",
+      "period": "2024-10",
+      "currency": "USD",
+      "average": "1.10",
+      "closing": "1.10"
+    },
+    {
+      "scenario": "Actual",
+      "period": "2024-10",
+      "currency": "EUR",
+      "average": "1.40",
+      "closing": "1.40"
+    },
+    {
+      "scenario": "Actual",
+      "period": "2024-10",
+      "currency": "GBP",
+      "average": "1.60",
+      "closing": "1.60"
+    }
+  ],
+  "formation_only": true,
+  "services_fully_consumed": true,
+  "average_rates_appropriate": true
+}

@@ -1,0 +1,49 @@
+name: creative-asset-toolkit / Check delivery toolkit
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - projects/creative-asset-toolkit/**
+    - .github/workflows/creative-asset-toolkit-check.yml
+  pull_request:
+    paths:
+    - projects/creative-asset-toolkit/**
+    - .github/workflows/creative-asset-toolkit-check.yml
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: debian:trixie-slim
+    timeout-minutes: 15
+    steps:
+    - name: Install real graphics tools
+      run: 'apt-get update -qq
+
+        apt-get install -y --no-install-recommends git ca-certificates inkscape gimp gir1.2-gimp-3.0 python3-gi python3-gi-cairo
+        python3-venv fonts-dejavu-core
+
+        '
+    - uses: actions/checkout@v4
+    - name: Install Python dependencies
+      run: 'python3 -m venv .venv
+
+        .venv/bin/pip install -r requirements-dev.txt
+
+        '
+    - name: Test real Inkscape and GIMP exports
+      env:
+        ASSET_REQUIRE_TOOLS: '1'
+      run: .venv/bin/python -m pytest -q
+    - name: Create hand-off
+      run: .venv/bin/python -m toolkit.export
+    - uses: actions/upload-artifact@v4
+      with:
+        name: northside-game-night-delivery
+        path: projects/creative-asset-toolkit/dist/game-night-v01/
+        if-no-files-found: error
+defaults:
+  run:
+    working-directory: projects/creative-asset-toolkit

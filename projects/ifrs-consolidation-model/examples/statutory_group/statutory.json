@@ -1,0 +1,88 @@
+{
+  "entity_name": "Maple Services Group Inc. (synthetic)",
+  "jurisdiction": "Canada, federal CBCA",
+  "basis": "Canadian GAAP, Part I of the CPA Canada Handbook (IFRS Accounting Standards), IAS 1 presentation for years ended 31 October 2026 and 2025",
+  "reporting_date": "2026-10-31",
+  "comparative_date": "2025-10-31",
+  "opening_date": "2024-10-31",
+  "authorisation_date": "2026-11-05",
+  "authorised_by": "Synthetic board of directors",
+  "registered_office": "Toronto, Ontario, Canada (fictional entity; no registered address)",
+  "activity": "Cash-funded consulting services supplied to external customers and group companies. All services were delivered and accepted within the reporting year.",
+  "profile": "cash_only_service_group",
+  "share_count": "50000",
+  "share_class": "Common shares without par value, unlimited authorised shares, one vote per share, fully paid. No options, treasury shares or restrictions.",
+  "ultimate_control": "One fictional individual shareholder controls the parent. No real person or private record is represented.",
+  "going_concern": "Management uses the going-concern basis. Positive unrestricted cash, no external debt or commitments and approved operating forecasts support continued operations; no material uncertainties were identified in either year.",
+  "revenue_policy": "Service revenue is recognised when completed services are accepted by customers. All external contracts were settled within the year; no contract assets, liabilities, warranties, variable consideration or remaining performance obligations exist at either year-end.",
+  "financial_instruments_policy": "Cash is held on demand with regulated banks, measured at amortised cost; its carrying amount approximates fair value. Credit risk is low and assessed expected credit losses are immaterial. No interest-bearing assets, hedges or external receivables exist.",
+  "risk": "Foreign-operation translation creates CAD equity exposure. There are no foreign-currency monetary balances outside each entity functional currency at year-end. Internal balances are eliminated. Cash is spread across regulated banks; no individual bank accounts for more than 25% of group cash. There are no external financial liabilities or liquidity commitments.",
+  "capital_management": "The group is funded by common equity and retained earnings. Management preserves sufficient unrestricted cash to meet forecast operating outflows. There are no externally imposed capital requirements or changes in approach.",
+  "judgments": "Functional currencies follow the primary service markets. Control is 100% from formation. Rates changed at the start of 2026 and were stable during each example year, so average and transaction-date rates equal closing rates. No significant estimation uncertainties or impairments were identified.",
+  "related_parties": "All subsidiaries are wholly owned; group service charges and balances are eliminated. There are no other related-party transactions or balances. Directors are unpaid and key management compensation is zero in both years.",
+  "commitments": "No leases, pensions, provisions, guarantees, contingencies, capital commitments or pledged/restricted cash exist in either year.",
+  "subsequent_events": "No adjusting or material non-adjusting events occurred between each reporting date and authorisation. No dividends were proposed or paid in either year.",
+  "new_standards": "IFRS 18 is not early adopted. For this service-only profile, management expects changes in presentation and disclosures from its effective reporting period, rather than recognition or measurement changes. No other issued but not yet effective standard is expected to have a material effect on these example balances.",
+  "restatements": "No retrospective policy changes, restatements or reclassifications occurred. An opening 2024 balance is supplied for cash and equity reconciliations, not because a third statement of financial position is required.",
+  "countries": {
+    "CA": "Canada",
+    "US": "United States (no state income tax in this example)",
+    "EU": "Germany",
+    "UK": "United Kingdom"
+  },
+  "tax": {
+    "2025": {
+      "CA": {
+        "rate": "0.265",
+        "losses_used": "0",
+        "deferred_tax": "0",
+        "unrecognised_losses": "0"
+      },
+      "US": {
+        "rate": "0.21",
+        "losses_used": "2000",
+        "deferred_tax": "0",
+        "unrecognised_losses": "0"
+      },
+      "EU": {
+        "rate": "0.30",
+        "losses_used": "1000",
+        "deferred_tax": "0",
+        "unrecognised_losses": "0"
+      },
+      "UK": {
+        "rate": "0.25",
+        "losses_used": "500",
+        "deferred_tax": "0",
+        "unrecognised_losses": "0"
+      }
+    },
+    "2026": {
+      "CA": {
+        "rate": "0.265",
+        "losses_used": "0",
+        "deferred_tax": "0",
+        "unrecognised_losses": "0"
+      },
+      "US": {
+        "rate": "0.21",
+        "losses_used": "0",
+        "deferred_tax": "0",
+        "unrecognised_losses": "0"
+      },
+      "EU": {
+        "rate": "0.30",
+        "losses_used": "0",
+        "deferred_tax": "0",
+        "unrecognised_losses": "0"
+      },
+      "UK": {
+        "rate": "0.25",
+        "losses_used": "0",
+        "deferred_tax": "0",
+        "unrecognised_losses": "0"
+      }
+    }
+  },
+  "tax_policy": "Current tax uses the supplied synthetic taxable profits and assumed local rates (including a 30% combined German rate). There are no permanent or temporary differences, uncertain tax positions, other taxes or deferred tax balances. Prior-year available losses were fully used against 2025 profits; none remained at either year-end. All current tax was paid in-year. These are scenario assumptions, not a tax-return calculation."
+}

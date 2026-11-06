@@ -1,0 +1,50 @@
+Actual Tickets =
+SUM(fact_demand[actual])
+
+Forecast Tickets =
+SUM(fact_demand[forecast])
+
+Matched Actual Tickets =
+SUM(fact_demand[matched_actual])
+
+Matched Forecast Tickets =
+SUMX(FILTER(fact_demand, NOT ISBLANK(fact_demand[matched_actual])), fact_demand[forecast])
+
+Forecast Variance Tickets =
+IF(NOT ISBLANK([Matched Actual Tickets]), [Matched Forecast Tickets] - [Matched Actual Tickets])
+
+Forecast Variance % =
+DIVIDE([Forecast Variance Tickets], [Matched Actual Tickets])
+
+Evaluation WAPE =
+DIVIDE(SUM(fact_demand[absolute_error]), [Matched Actual Tickets])
+
+Evaluation MAE =
+AVERAGE(fact_demand[absolute_error])
+
+Future Forecast Tickets =
+CALCULATE([Forecast Tickets], KEEPFILTERS(fact_demand[period] = "future"))
+
+Planning Tickets =
+CALCULATE(SUM(fact_demand[planning_volume]), KEEPFILTERS(fact_demand[period] = "future"))
+
+Required Agent Shifts =
+SUMX(FILTER(fact_demand, fact_demand[period] = "future"), VAR Workload = fact_demand[planning_volume] * RELATED(dim_region[handling_minutes]) VAR Capacity = RELATED(dim_region[paid_hours]) * 60 * (1 - RELATED(dim_region[shrinkage])) * RELATED(dim_region[occupancy]) VAR People = ROUND(DIVIDE(Workload, Capacity), 10) RETURN MAX(IF(fact_demand[planning_volume] > 0, 1, 0), ROUNDUP(People, 0)))
+
+Required Headcount =
+IF(HASONEVALUE(dim_date[date]), [Required Agent Shifts])
+
+Peak Daily Headcount =
+MAXX(VALUES(dim_date[date]), [Required Agent Shifts])
+
+Available Agent Shifts =
+SUMX(FILTER(fact_demand, fact_demand[period] = "future"), RELATED(dim_region[available_headcount]))
+
+Headcount Gap =
+IF(HASONEVALUE(dim_date[date]) && NOT ISBLANK([Required Agent Shifts]), [Required Agent Shifts] - [Available Agent Shifts])
+
+Backtest WAPE =
+DIVIDE(SUM(fact_backtest[absolute_error]), SUM(fact_backtest[actual]))
+
+Backtest MAE =
+AVERAGE(fact_backtest[absolute_error])

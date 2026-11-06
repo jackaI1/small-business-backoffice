@@ -1,0 +1,66 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "staffing_totals",
+  "position": {
+    "x": 20,
+    "y": 560,
+    "z": 0,
+    "height": 140,
+    "width": 1240,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_region"
+                    }
+                  },
+                  "Property": "region_name"
+                }
+              },
+              "queryRef": "dim_region.region_name",
+              "nativeQueryRef": "region_name"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_demand"
+                    }
+                  },
+                  "Property": "Required Agent Shifts"
+                }
+              },
+              "queryRef": "fact_demand.Required Agent Shifts",
+              "nativeQueryRef": "Required Agent Shifts"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_demand"
+                    }
+                  },
+                  "Property": "Peak Daily Headcount"
+                }
+              },
+              "queryRef": "fact_demand.Peak Daily Headcount",
+              "nativeQueryRef": "Peak Daily Headcount"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

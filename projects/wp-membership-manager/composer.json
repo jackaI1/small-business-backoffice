@@ -1,0 +1,9 @@
+{
+  "name": "jacklai/wp-membership-manager",
+  "description": "Association membership records and local email campaign demo",
+  "license": "MIT",
+  "require": {"php": ">=8.2"},
+  "require-dev": {"phpunit/phpunit": "^11.5"},
+  "autoload": {"psr-4": {"WPMM\\": "src/"}},
+  "scripts": {"test": "phpunit", "lint": "find src tests -name '*.php' -print0 | xargs -0 -n1 php -l"}
+}

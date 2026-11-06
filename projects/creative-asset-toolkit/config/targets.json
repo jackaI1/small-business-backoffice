@@ -1,0 +1,13 @@
+{
+  "campaign": "northside-game-night",
+  "revision": "v01",
+  "targets": [
+    {"name": "social-square", "width": 1080, "height": 1080, "layout": "square", "safe": [60, 60, 60, 60]},
+    {"name": "social-story", "width": 1080, "height": 1920, "layout": "portrait", "safe": [96, 250, 96, 300]},
+    {"name": "social-landscape", "width": 1200, "height": 630, "layout": "landscape", "safe": [50, 40, 50, 40]},
+    {"name": "web-banner", "width": 1600, "height": 600, "layout": "landscape", "safe": [60, 40, 60, 40]},
+    {"name": "ooh-portrait", "width": 1080, "height": 1920, "layout": "portrait", "safe": [90, 100, 90, 100]},
+    {"name": "arena-screen", "width": 1920, "height": 1080, "layout": "landscape", "safe": [96, 54, 96, 54]},
+    {"name": "arena-ribbon", "width": 3840, "height": 480, "layout": "ribbon", "safe": [100, 40, 100, 40]}
+  ]
+}

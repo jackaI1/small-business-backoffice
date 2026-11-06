@@ -1,0 +1,9 @@
+{
+  "operation": "action",
+  "formId": "LAB-001",
+  "action": "submit",
+  "actor": {
+    "id": "requester-1",
+    "role": "REQUESTER"
+  }
+}

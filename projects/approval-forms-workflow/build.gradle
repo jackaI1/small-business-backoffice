@@ -1,0 +1,34 @@
+plugins { id 'groovy' }
+repositories { mavenCentral() }
+dependencies {
+    implementation 'org.apache.groovy:groovy:4.0.27'
+    implementation 'org.apache.groovy:groovy-json:4.0.27'
+    testImplementation platform('org.spockframework:spock-bom:2.4-groovy-4.0')
+    testImplementation 'org.spockframework:spock-core'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+tasks.withType(GroovyCompile).configureEach { groovyOptions.fork = false }
+test {
+    useJUnitPlatform()
+    systemProperty 'workflow.classpath', sourceSets.main.runtimeClasspath.asPath
+    maxHeapSize = '256m'
+    testLogging { events 'failed', 'skipped'; exceptionFormat = 'short' }
+}
+tasks.register('workflow', JavaExec) {
+    dependsOn classes
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'groovy.ui.GroovyMain'
+    maxHeapSize = '192m'
+    args 'scripts/workflow.groovy',
+        providers.gradleProperty('request').getOrElse('examples/create.json'),
+        providers.gradleProperty('store').getOrElse('build/forms.json'),
+        providers.gradleProperty('rules').getOrElse('rules')
+}
+tasks.register('demo', JavaExec) {
+    dependsOn classes
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'groovy.ui.GroovyMain'
+    maxHeapSize = '192m'
+    args 'scripts/demo.groovy'
+}

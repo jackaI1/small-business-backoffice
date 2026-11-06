@@ -1,0 +1,14 @@
+{
+  "id": "C-BANK",
+  "process_id": "P-CLOSE",
+  "risk": "Cash is misstated because reconciling differences are unresolved",
+  "description": "Controller reviews monthly bank reconciliations and dates their approval before close signoff.",
+  "owner": "Controller",
+  "frequency": "monthly",
+  "key": true,
+  "assertion": "Existence and accuracy",
+  "test_procedure": "Agree the balance to the bank statement, reperform the reconciliation and inspect dated independent approval before close signoff.",
+  "evidence_expected": "Bank statement, reconciliation and dated independent approval",
+  "author": "Controller",
+  "reason": "Initial risk and control matrix"
+}

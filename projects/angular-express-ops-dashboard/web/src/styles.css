@@ -1,0 +1,10 @@
+:root { color-scheme: light; --ink: #23364a; --muted: #52657a; --blue: #185c91; --line: #d3dfe9; --paper: #fff; --background: #f4f7fa; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--background); color: var(--ink); font-family: 'Avenir Next', 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.5; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: .55; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+::selection { background: #c2e3fa; color: #112a41; }
+input { caret-color: var(--blue); }
+* { scrollbar-color: #869bb0 #edf2f7; scrollbar-width: thin; }

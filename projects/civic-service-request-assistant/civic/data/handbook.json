@@ -1,0 +1,30 @@
+[
+  {
+    "id": "roads-potholes",
+    "title": "Roads handbook",
+    "section": "Pothole reports",
+    "topics": ["pothole", "potholes"],
+    "passage": "Report a pothole with the street name, nearest intersection and a description of the damage. Staff review pothole reports within two business days. This is a review target, not a repair deadline."
+  },
+  {
+    "id": "roads-lights",
+    "title": "Roads handbook",
+    "section": "Streetlight outages",
+    "topics": ["streetlight", "streetlights", "street light"],
+    "passage": "For a streetlight outage, include the nearest intersection and the pole number if visible from a safe place. Do not touch a damaged pole or exposed wire. Call emergency services for an immediate danger."
+  },
+  {
+    "id": "waste-missed",
+    "title": "Waste collection guide",
+    "section": "Missed collection",
+    "topics": ["waste", "garbage", "collection", "bin", "bins"],
+    "passage": "Report missed waste collection after 6 p.m. on your scheduled collection day and within one business day. Leave the bin at the curb until staff provide instructions. This guide does not list collection schedules for individual addresses."
+  },
+  {
+    "id": "parks-maintenance",
+    "title": "Parks service guide",
+    "section": "Maintenance reports",
+    "topics": ["park", "parks", "playground"],
+    "passage": "Report park maintenance issues with the park name and the nearest entrance or landmark. Keep away from damaged playground equipment. Staff review park maintenance reports within three business days."
+  }
+]

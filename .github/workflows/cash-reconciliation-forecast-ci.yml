@@ -1,0 +1,49 @@
+name: cash-reconciliation-forecast / Tests and working demo
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - projects/cash-reconciliation-forecast/**
+    - .github/workflows/cash-reconciliation-forecast-ci.yml
+  pull_request:
+    paths:
+    - projects/cash-reconciliation-forecast/**
+    - .github/workflows/cash-reconciliation-forecast-ci.yml
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: cash_forecast
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+        - 5432:5432
+        options: --health-cmd "pg_isready -U postgres -d cash_forecast" --health-interval 5s --health-timeout 5s --health-retries
+          10
+    env:
+      DATABASE_URL: postgresql://postgres@localhost:5432/cash_forecast
+      TEST_DATABASE_URL: postgresql://postgres@localhost:5432/cash_forecast
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: pip install -e '.[dev]'
+    - run: sudo apt-get update -qq && sudo apt-get install -y -qq libreoffice-calc
+    - run: ruff check .
+    - run: pytest -q
+    - run: cash-forecast --input data/synthetic --as-of 2026-10-31 --output output/demo
+    - uses: actions/upload-artifact@v4
+      with:
+        name: synthetic-cash-report
+        path: projects/cash-reconciliation-forecast/output/demo/
+    timeout-minutes: 20
+defaults:
+  run:
+    working-directory: projects/cash-reconciliation-forecast

@@ -1,0 +1,17 @@
+SYNTHETIC DEMONSTRATION ONLY
+$company
+Employment confirmation
+Issued: $issued_date
+
+To whom it may concern,
+
+This letter confirms that $employee_name (employee reference $employee_code)
+is employed by $company as $title in $department.
+Their recorded employment start date is $hire_date.
+
+This confirmation does not include compensation, absence balances or private
+file notes. All people and employment details in this demonstration are fictional.
+
+Sincerely,
+$signatory
+HR office, $company

@@ -1,0 +1,40 @@
+name: creative-brief-tracker / CI
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - projects/creative-brief-tracker/**
+    - .github/workflows/creative-brief-tracker-ci.yml
+  pull_request:
+    paths:
+    - projects/creative-brief-tracker/**
+    - .github/workflows/creative-brief-tracker-ci.yml
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python:
+        - '3.10'
+        - '3.12'
+    steps:
+    - uses: actions/checkout@v4
+    - uses: astral-sh/setup-uv@v7
+      with:
+        python-version: ${{ matrix.python }}
+        enable-cache: true
+        working-directory: projects/creative-brief-tracker
+    - run: uv sync --locked
+    - run: uv run ruff check .
+    - run: uv run ruff format --check .
+    - run: uv run pytest -q
+    - run: uv build
+    - run: uv run brief-tracker demo --out out/ci-demo
+    timeout-minutes: 20
+defaults:
+  run:
+    working-directory: projects/creative-brief-tracker

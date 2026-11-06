@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Staff desk | Northfield</title><link rel="stylesheet" href="/static/style.css"><script src="/static/staff.js" defer></script></head>
+<body><header><a href="/" class="identity">Northfield <span>Staff desk</span></a><nav aria-label="Main"><a href="/">Resident desk</a><button id="lock" class="quiet" type="button">Lock desk</button></nav></header><main>
+<div class="notice">Fictional records only. Staff access is a shared local token, not a production sign-in system.</div>
+<div class="intro"><h1>Review. Route. Resolve.</h1><p>Approve a report before work begins. Every change keeps a note, and a second staff member cannot silently overwrite your decision.</p></div>
+<form id="access-form" class="access"><label for="token">Staff access token</label><input id="token" type="password" required autocomplete="off"><button type="submit">Open queue</button></form>
+<div id="staff-message" role="status" aria-live="polite"></div>
+<div id="workspace" hidden><div class="toolbar"><h2>Request queue</h2><div><label for="status-filter">Status</label><select id="status-filter"><option value="">All statuses</option></select><label for="service-filter">Service</label><select id="service-filter"><option value="">All services</option></select><button id="refresh" class="secondary" type="button">Refresh</button></div></div>
+<p id="queue-count"></p><div class="staff-layout"><div id="queue" aria-label="Requests"></div><section id="detail" aria-live="polite"><h2>Choose a request</h2><p>Open a report to review details, record a decision or export a safe summary.</p></section></div></div>
+</main><footer>Local staff desk. Lock the desk when you finish.</footer></body></html>

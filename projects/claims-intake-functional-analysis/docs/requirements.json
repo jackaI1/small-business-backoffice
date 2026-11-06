@@ -1,0 +1,137 @@
+[
+  {
+    "id": "R01",
+    "requirement": "Import a non-empty JSON claim batch with a stable claim reference.",
+    "priority": "P1",
+    "owner": "Intake operator",
+    "acceptance": "Valid sample batch returns one result per item; untrackable envelopes exit 2.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R02",
+    "requirement": "Flag missing required details and wrong field types.",
+    "priority": "P1",
+    "owner": "Intake operator",
+    "acceptance": "Each missing required business field produces MISSING:<field>; invalid types remain reviewable.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R03",
+    "requirement": "Check the immutable policy snapshot, property and loss-date interval.",
+    "priority": "P1",
+    "owner": "Policy analyst",
+    "acceptance": "Unknown policy, mismatched property and outside-period loss flag review; both period endpoints are included.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R04",
+    "requirement": "Validate dates and reporting chronology against an explicit evaluation date.",
+    "priority": "P1",
+    "owner": "Intake operator",
+    "acceptance": "Invalid ISO dates, loss after report and future dates are flagged.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R05",
+    "requirement": "Validate loss type and integer-cent amount; escalate high value.",
+    "priority": "P1",
+    "owner": "Claims supervisor",
+    "acceptance": "Only water/fire/theft/wind and 1..1,000,000,000 cents are valid; at least 2,500,000 cents flags review.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R06",
+    "requirement": "Request loss-specific evidence labels.",
+    "priority": "P1",
+    "owner": "Adjuster",
+    "acceptance": "Water/fire/wind require photos; theft requires inventory and police_reference; absent labels flag review.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R07",
+    "requirement": "Make identical resubmissions idempotent.",
+    "priority": "P1",
+    "owner": "Intake operator",
+    "acceptance": "Same exact reference and canonical JSON returns the same ID and original decision without new audit events.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R08",
+    "requirement": "Detect reference conflicts and possible duplicate losses without deleting either record.",
+    "priority": "P1",
+    "owner": "Claims supervisor",
+    "acceptance": "Changed same-reference payload flags conflict; different reference with same known policy, valid loss date and type flags possible duplicate.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R09",
+    "requirement": "Route all flags to human review and clean claims to an adjuster.",
+    "priority": "P1",
+    "owner": "Adjuster",
+    "acceptance": "Any nonempty reason list means NEEDS_REVIEW; no flags means READY_FOR_ADJUSTER, never approval.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R10",
+    "requirement": "Persist payloads, decisions and actor-stamped audit events.",
+    "priority": "P1",
+    "owner": "Claims supervisor",
+    "acceptance": "Records survive reopening the SQLite file; intake and review events include actor, timestamp and details.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R11",
+    "requirement": "Record one explicit human triage action per flagged record.",
+    "priority": "P1",
+    "owner": "Reviewer",
+    "acceptance": "Only request_information/refer_adjuster/close_duplicate are accepted; closing needs a duplicate flag; no action approves payment.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R12",
+    "requirement": "Show pending review work and reconcilable routing counts.",
+    "priority": "P1",
+    "owner": "Claims supervisor",
+    "acceptance": "Pending queue excludes reviewed records; flagged plus ready equals total and reviewed plus pending equals flagged.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R13",
+    "requirement": "Keep batch writes atomic and duplicate detection serialized.",
+    "priority": "P1",
+    "owner": "System owner",
+    "acceptance": "Malformed input or storage failure leaves no partial claims/audit; conflicting writers cannot bypass the write lock.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R14",
+    "requirement": "Generate an executed requirement-level QA report.",
+    "priority": "P1",
+    "owner": "Business owner",
+    "acceptance": "Every requirement has executed passing tests; failed, skipped or untested requirements prevent overall PASS.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  },
+  {
+    "id": "R15",
+    "requirement": "Recalculate a three-option decision model and review-rate sensitivity.",
+    "priority": "P2",
+    "owner": "Business owner",
+    "acceptance": "Documented assumptions reproduce cost, capacity and sensitivity outputs without presenting estimates as measurements.",
+    "source": "Fictional workshop assumption; see functional-analysis.md",
+    "status": "Implemented for prototype"
+  }
+]

@@ -1,0 +1,24 @@
+name: Source syntax
+on:
+  push:
+    branches:
+    - main
+    paths-ignore:
+    - projects/**
+  pull_request:
+    paths-ignore:
+    - projects/**
+permissions:
+  contents: read
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Parse Python sources without importing or running them
+      run: "python - <<'PY'\nimport ast\nfrom pathlib import Path\nfiles = list(Path('projects').rglob('*.py'))\nfor path\
+        \ in files:\n    ast.parse(path.read_text(encoding='utf-8-sig'), filename=str(path))\nprint(f'Parsed {len(files)}\
+        \ Python source files. Project suites run in their separate workflows.')\nPY\n"

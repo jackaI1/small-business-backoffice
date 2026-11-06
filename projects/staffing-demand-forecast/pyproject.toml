@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "staffing-demand-forecast"
+version = "0.1.0"
+description = "Backtested daily ticket forecasts and auditable staffing plans"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["numpy>=2.0,<3", "pandas>=2.2,<3", "statsmodels>=0.14.4,<0.15", "openpyxl>=3.1.5,<4"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1", "jsonschema>=4.23,<5", "formulas>=1.3,<2"]
+
+[project.scripts]
+staffing-refresh = "staffing_forecast.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/staffing_forecast"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

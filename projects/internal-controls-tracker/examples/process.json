@@ -1,0 +1,7 @@
+{
+  "id": "P-CLOSE",
+  "name": "Northstar Components financial close",
+  "narrative": "The accountant prepares monthly bank reconciliations. The controller compares them to bank statements, checks reconciling items and dates an independent approval before close signoff. Both retain the statement, reconciliation and approval in the close folder.",
+  "author": "Controller",
+  "reason": "Initial fictional walkthrough"
+}

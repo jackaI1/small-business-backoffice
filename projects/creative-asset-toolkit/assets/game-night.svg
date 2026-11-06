@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <title>Northside game night, fictional basketball promotion</title>
+  <desc>All teams, venue and promotion details are synthetic. Edit the text in the named groups; the exporter fits each group into a channel layout.</desc>
+  <rect id="background" width="1600" height="900" fill="#102e34"/>
+  <path id="accent" d="M 0,870 H 1600 V 900 H 0 Z" fill="#d6ff61"/>
+  <g id="brand" transform="translate(90 70)" fill="#d6ff61" font-family="DejaVu Sans, sans-serif" font-weight="bold">
+    <path d="M0 0 H36 V36 H0 Z M9 9 V27 H27 V9 Z" fill-rule="evenodd"/>
+    <text x="52" y="29" font-size="31" letter-spacing="4">NORTHSIDE / BASKETBALL</text>
+  </g>
+  <g id="headline" transform="translate(90 180)" font-family="DejaVu Sans, sans-serif" font-weight="bold" font-size="136" letter-spacing="-6">
+    <text x="0" y="110" fill="#f7f7eb">GAME</text>
+    <text x="0" y="246" fill="#d6ff61">NIGHT.</text>
+  </g>
+  <g id="matchup" transform="translate(90 500)" fill="#f7f7eb" font-family="DejaVu Sans, sans-serif">
+    <text x="0" y="32" font-size="30" letter-spacing="4">NORTHSIDE COMETS</text>
+    <text x="0" y="76" font-size="26" fill="#a6c6c7">VS. HARBOR FOXES</text>
+  </g>
+  <g id="event" transform="translate(1050 680)" fill="#f7f7eb" font-family="DejaVu Sans, sans-serif">
+    <text x="0" y="34" font-size="32" font-weight="bold">FRI 12 FEB / 7:00 PM</text>
+    <text x="0" y="78" font-size="26" fill="#a6c6c7">NORTHSIDE FIELDHOUSE</text>
+  </g>
+  <g id="cta" transform="translate(90 700)" font-family="DejaVu Sans, sans-serif" font-weight="bold">
+    <rect width="500" height="76" rx="10" fill="#d6ff61"/>
+    <text x="26" y="49" font-size="30" fill="#102e34">BRING YOUR LOUD.</text>
+    <text x="0" y="115" font-size="18" fill="#a6c6c7" letter-spacing="2">FICTIONAL EVENT / DEMO ARTWORK</text>
+  </g>
+  <g id="art" transform="translate(1000 150) scale(.85)">
+    <circle cx="270" cy="270" r="260" fill="#1c454b"/>
+    <circle cx="270" cy="270" r="200" fill="#d6ff61" stroke="#102e34" stroke-width="10"/>
+    <g fill="none" stroke="#102e34" stroke-width="12">
+      <path d="M70 270 H470 M270 70 V470 M128 128 Q410 270 128 412 M412 128 Q130 270 412 412"/>
+    </g>
+    <path d="M20 520 L520 20 M100 530 L530 100" fill="none" stroke="#f7f7eb" stroke-width="8"/>
+  </g>
+</svg>

@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+**/bin/
+**/obj/
+.DS_Store
+.pbi/
+*.abf
+outputs/*
+!outputs/sample/
+!outputs/sample/**

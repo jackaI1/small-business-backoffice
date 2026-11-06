@@ -1,0 +1,11 @@
+year,movement,share_capital,retained_earnings,translation_reserve,total
+2025,opening_balance,50000.00,0,0.00,50000.00
+2025,profit_loss,0,4400.00,0,4400.00
+2025,translation_oci,0,0,0.00,0.00
+2025,owner_contributions_and_distributions,0,0,0,0
+2025,closing_balance,50000.00,4400.00,0.00,54400.00
+2026,opening_balance,50000.00,4400.00,0.00,54400.00
+2026,profit_loss,0,11381.500,0,11381.500
+2026,translation_oci,0,0,3675.000,3675.000
+2026,owner_contributions_and_distributions,0,0,0,0
+2026,closing_balance,50000.00,15781.500,3675.000,69456.500

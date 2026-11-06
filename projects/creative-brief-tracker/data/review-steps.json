@@ -1,0 +1,6 @@
+[
+  {"key": "copy", "name": "Ticket message and copy", "assignee": "morgan", "days": 2, "hours": 4},
+  {"key": "design", "name": "Poster and social artwork", "assignee": "avery", "days": 3, "hours": 12},
+  {"key": "review", "name": "Creative lead approval", "assignee": "riley", "days": 1, "hours": 2, "approval": true},
+  {"key": "export", "name": "Final arena screen exports", "assignee": "avery", "days": 1, "hours": 4}
+]

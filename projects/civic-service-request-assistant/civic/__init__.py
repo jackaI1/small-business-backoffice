@@ -1,0 +1,1 @@
+"""Fictional city service desk."""

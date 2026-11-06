@@ -1,0 +1,37 @@
+name: life-insurance-projection-lifelib / projection-tests
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - projects/life-insurance-projection-lifelib/**
+    - .github/workflows/life-insurance-projection-lifelib-ci.yml
+  pull_request:
+    paths:
+    - projects/life-insurance-projection-lifelib/**
+    - .github/workflows/life-insurance-projection-lifelib-ci.yml
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: pip
+    - name: Install native spreadsheet engine
+      run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends libreoffice-calc
+    - run: python -m pip install -e '.[test]'
+    - run: python -m pytest -q
+    - run: insurance-project --output outputs/projection.xlsx
+    - uses: actions/upload-artifact@v4
+      with:
+        name: insurance-projection-report
+        path: projects/life-insurance-projection-lifelib/outputs/projection.*
+    timeout-minutes: 20
+defaults:
+  run:
+    working-directory: projects/life-insurance-projection-lifelib

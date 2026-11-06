@@ -1,0 +1,36 @@
+name: hr-absence-workflow / Tests
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - projects/hr-absence-workflow/**
+    - .github/workflows/hr-absence-workflow-test.yml
+  pull_request:
+    paths:
+    - projects/hr-absence-workflow/**
+    - .github/workflows/hr-absence-workflow-test.yml
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+        - '3.11'
+        - '3.12'
+        - '3.13'
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Run complete test suite
+      run: python -W error::ResourceWarning -m unittest discover -v
+defaults:
+  run:
+    working-directory: projects/hr-absence-workflow

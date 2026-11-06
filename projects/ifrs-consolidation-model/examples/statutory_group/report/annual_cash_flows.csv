@@ -1,0 +1,11 @@
+line,current,comparative
+customer_receipts,41950.00,17200.00
+supplier_payments,-26850.00,-12800.00
+tax_paid,-3718.500,0.00
+net_operating_cash_flow,11381.500,4400.00
+net_investing_cash_flow,0,0
+net_financing_cash_flow,0,0
+net_cash_flow,11381.500,4400.00
+exchange_effect_on_cash,3675.000,0.00
+opening_cash,54400.00,50000.00
+closing_cash,69456.500,54400.00

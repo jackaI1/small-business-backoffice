@@ -1,0 +1,4 @@
+Record Type,Record ID,Name,Email,Level,Expires On,Email Consent,Event ID,Amount,Paid Amount,Agreement
+member,003-demo-1,Alex Example,alex@example.test,student,2026-06-20,yes,,,,
+member,003-demo-2,Sam Example,sam@example.test,professional,2026-05-31,no,,,,
+sponsor,006-demo-1,Example Instruments,,,,,e1,1500.00,500.00,Programme logo and two seats

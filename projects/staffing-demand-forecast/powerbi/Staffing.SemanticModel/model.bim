@@ -1,0 +1,614 @@
+{
+  "name": "Staffing",
+  "compatibilityLevel": 1600,
+  "model": {
+    "culture": "en-US",
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "expressions": [
+      {
+        "name": "SourceFolder",
+        "kind": "m",
+        "expression": "\"C:\\staffing-demand-forecast\\outputs\\sample\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]"
+      },
+      {
+        "name": "ReadCsv",
+        "kind": "m",
+        "expression": [
+          "(name as text) as table =>",
+          "let",
+          "    Raw = Csv.Document(File.Contents(SourceFolder & \"/\" & name & \".csv\"), [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),",
+          "    Headers = Table.PromoteHeaders(Raw, [PromoteAllScalars=true]),",
+          "    Blanks = Table.ReplaceValue(Headers, \"\", null, Replacer.ReplaceValue, Table.ColumnNames(Headers))",
+          "in Blanks"
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "name": "fact_demand",
+        "columns": [
+          {
+            "name": "date",
+            "dataType": "dateTime",
+            "sourceColumn": "date",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          },
+          {
+            "name": "region_id",
+            "dataType": "string",
+            "sourceColumn": "region_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "actual",
+            "dataType": "double",
+            "sourceColumn": "actual",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "forecast",
+            "dataType": "double",
+            "sourceColumn": "forecast",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "period",
+            "dataType": "string",
+            "sourceColumn": "period",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "model",
+            "dataType": "string",
+            "sourceColumn": "model",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "origin_date",
+            "dataType": "dateTime",
+            "sourceColumn": "origin_date",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          },
+          {
+            "name": "absolute_error",
+            "dataType": "double",
+            "sourceColumn": "absolute_error",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "matched_actual",
+            "dataType": "double",
+            "sourceColumn": "matched_actual",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "planning_volume",
+            "dataType": "double",
+            "sourceColumn": "planning_volume",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "required_headcount",
+            "dataType": "int64",
+            "sourceColumn": "required_headcount",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "headcount_gap",
+            "dataType": "int64",
+            "sourceColumn": "headcount_gap",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "fact_demand",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = ReadCsv(\"fact_demand\"),",
+                "    Typed = Table.TransformColumnTypes(Source, {{\"date\", type date}, {\"region_id\", type text}, {\"actual\", type number}, {\"forecast\", type number}, {\"period\", type text}, {\"model\", type text}, {\"origin_date\", type date}, {\"absolute_error\", type number}, {\"matched_actual\", type number}, {\"planning_volume\", type number}, {\"required_headcount\", Int64.Type}, {\"headcount_gap\", Int64.Type}}, \"en-US\")",
+                "in Typed"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Actual Tickets",
+            "expression": "SUM(fact_demand[actual])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Forecast Tickets",
+            "expression": "SUM(fact_demand[forecast])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Matched Actual Tickets",
+            "expression": "SUM(fact_demand[matched_actual])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Matched Forecast Tickets",
+            "expression": "SUMX(FILTER(fact_demand, NOT ISBLANK(fact_demand[matched_actual])), fact_demand[forecast])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Forecast Variance Tickets",
+            "expression": "IF(NOT ISBLANK([Matched Actual Tickets]), [Matched Forecast Tickets] - [Matched Actual Tickets])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Forecast Variance %",
+            "expression": "DIVIDE([Forecast Variance Tickets], [Matched Actual Tickets])",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "Evaluation WAPE",
+            "expression": "DIVIDE(SUM(fact_demand[absolute_error]), [Matched Actual Tickets])",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "Evaluation MAE",
+            "expression": "AVERAGE(fact_demand[absolute_error])",
+            "formatString": "#,0.0"
+          },
+          {
+            "name": "Future Forecast Tickets",
+            "expression": "CALCULATE([Forecast Tickets], KEEPFILTERS(fact_demand[period] = \"future\"))",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Planning Tickets",
+            "expression": "CALCULATE(SUM(fact_demand[planning_volume]), KEEPFILTERS(fact_demand[period] = \"future\"))",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Required Agent Shifts",
+            "expression": "SUMX(FILTER(fact_demand, fact_demand[period] = \"future\"), VAR Workload = fact_demand[planning_volume] * RELATED(dim_region[handling_minutes]) VAR Capacity = RELATED(dim_region[paid_hours]) * 60 * (1 - RELATED(dim_region[shrinkage])) * RELATED(dim_region[occupancy]) VAR People = ROUND(DIVIDE(Workload, Capacity), 10) RETURN MAX(IF(fact_demand[planning_volume] > 0, 1, 0), ROUNDUP(People, 0)))",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Required Headcount",
+            "expression": "IF(HASONEVALUE(dim_date[date]), [Required Agent Shifts])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Peak Daily Headcount",
+            "expression": "MAXX(VALUES(dim_date[date]), [Required Agent Shifts])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Available Agent Shifts",
+            "expression": "SUMX(FILTER(fact_demand, fact_demand[period] = \"future\"), RELATED(dim_region[available_headcount]))",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Headcount Gap",
+            "expression": "IF(HASONEVALUE(dim_date[date]) && NOT ISBLANK([Required Agent Shifts]), [Required Agent Shifts] - [Available Agent Shifts])",
+            "formatString": "#,0"
+          },
+          {
+            "name": "Backtest WAPE",
+            "expression": "DIVIDE(SUM(fact_backtest[absolute_error]), SUM(fact_backtest[actual]))",
+            "formatString": "0.0%"
+          },
+          {
+            "name": "Backtest MAE",
+            "expression": "AVERAGE(fact_backtest[absolute_error])",
+            "formatString": "#,0.0"
+          }
+        ]
+      },
+      {
+        "name": "fact_backtest",
+        "columns": [
+          {
+            "name": "region_id",
+            "dataType": "string",
+            "sourceColumn": "region_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "fold",
+            "dataType": "int64",
+            "sourceColumn": "fold",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "phase",
+            "dataType": "string",
+            "sourceColumn": "phase",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "origin_date",
+            "dataType": "dateTime",
+            "sourceColumn": "origin_date",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          },
+          {
+            "name": "date",
+            "dataType": "dateTime",
+            "sourceColumn": "date",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          },
+          {
+            "name": "lead_days",
+            "dataType": "int64",
+            "sourceColumn": "lead_days",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "model",
+            "dataType": "string",
+            "sourceColumn": "model",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "actual",
+            "dataType": "double",
+            "sourceColumn": "actual",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "forecast",
+            "dataType": "double",
+            "sourceColumn": "forecast",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "absolute_error",
+            "dataType": "double",
+            "sourceColumn": "absolute_error",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "fact_backtest",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = ReadCsv(\"fact_backtest\"),",
+                "    Typed = Table.TransformColumnTypes(Source, {{\"region_id\", type text}, {\"fold\", Int64.Type}, {\"phase\", type text}, {\"origin_date\", type date}, {\"date\", type date}, {\"lead_days\", Int64.Type}, {\"model\", type text}, {\"actual\", type number}, {\"forecast\", type number}, {\"absolute_error\", type number}}, \"en-US\")",
+                "in Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "fact_metrics",
+        "columns": [
+          {
+            "name": "region_id",
+            "dataType": "string",
+            "sourceColumn": "region_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "phase",
+            "dataType": "string",
+            "sourceColumn": "phase",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "model",
+            "dataType": "string",
+            "sourceColumn": "model",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "selected",
+            "dataType": "int64",
+            "sourceColumn": "selected",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "mae",
+            "dataType": "double",
+            "sourceColumn": "mae",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "rmse",
+            "dataType": "double",
+            "sourceColumn": "rmse",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "wape",
+            "dataType": "double",
+            "sourceColumn": "wape",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "bias",
+            "dataType": "double",
+            "sourceColumn": "bias",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "n",
+            "dataType": "int64",
+            "sourceColumn": "n",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "fact_metrics",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = ReadCsv(\"fact_metrics\"),",
+                "    Typed = Table.TransformColumnTypes(Source, {{\"region_id\", type text}, {\"phase\", type text}, {\"model\", type text}, {\"selected\", Int64.Type}, {\"mae\", type number}, {\"rmse\", type number}, {\"wape\", type number}, {\"bias\", type number}, {\"n\", Int64.Type}}, \"en-US\")",
+                "in Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "dim_date",
+        "columns": [
+          {
+            "name": "date",
+            "dataType": "dateTime",
+            "sourceColumn": "date",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          },
+          {
+            "name": "year",
+            "dataType": "int64",
+            "sourceColumn": "year",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "month",
+            "dataType": "int64",
+            "sourceColumn": "month",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "month_name",
+            "dataType": "string",
+            "sourceColumn": "month_name",
+            "summarizeBy": "none",
+            "sortByColumn": "month"
+          },
+          {
+            "name": "weekday_number",
+            "dataType": "int64",
+            "sourceColumn": "weekday_number",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "weekday",
+            "dataType": "string",
+            "sourceColumn": "weekday",
+            "summarizeBy": "none",
+            "sortByColumn": "weekday_number"
+          },
+          {
+            "name": "week_start",
+            "dataType": "dateTime",
+            "sourceColumn": "week_start",
+            "summarizeBy": "none",
+            "formatString": "yyyy-MM-dd"
+          },
+          {
+            "name": "is_future",
+            "dataType": "int64",
+            "sourceColumn": "is_future",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_date",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = ReadCsv(\"dim_date\"),",
+                "    Typed = Table.TransformColumnTypes(Source, {{\"date\", type date}, {\"year\", Int64.Type}, {\"month\", Int64.Type}, {\"month_name\", type text}, {\"weekday_number\", Int64.Type}, {\"weekday\", type text}, {\"week_start\", type date}, {\"is_future\", Int64.Type}}, \"en-US\")",
+                "in Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "dim_region",
+        "columns": [
+          {
+            "name": "region_id",
+            "dataType": "string",
+            "sourceColumn": "region_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "region_name",
+            "dataType": "string",
+            "sourceColumn": "region_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "handling_minutes",
+            "dataType": "double",
+            "sourceColumn": "handling_minutes",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "paid_hours",
+            "dataType": "double",
+            "sourceColumn": "paid_hours",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "shrinkage",
+            "dataType": "double",
+            "sourceColumn": "shrinkage",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "occupancy",
+            "dataType": "double",
+            "sourceColumn": "occupancy",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "available_headcount",
+            "dataType": "int64",
+            "sourceColumn": "available_headcount",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_region",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = ReadCsv(\"dim_region\"),",
+                "    Typed = Table.TransformColumnTypes(Source, {{\"region_id\", type text}, {\"region_name\", type text}, {\"handling_minutes\", type number}, {\"paid_hours\", type number}, {\"shrinkage\", type number}, {\"occupancy\", type number}, {\"available_headcount\", Int64.Type}}, \"en-US\")",
+                "in Typed"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "dim_model",
+        "columns": [
+          {
+            "name": "model",
+            "dataType": "string",
+            "sourceColumn": "model",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_model",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = ReadCsv(\"dim_model\"),",
+                "    Typed = Table.TransformColumnTypes(Source, {{\"model\", type text}}, \"en-US\")",
+                "in Typed"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "fact_demand_dim_date",
+        "fromTable": "fact_demand",
+        "fromColumn": "date",
+        "toTable": "dim_date",
+        "toColumn": "date",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "fact_demand_dim_region",
+        "fromTable": "fact_demand",
+        "fromColumn": "region_id",
+        "toTable": "dim_region",
+        "toColumn": "region_id",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "fact_demand_dim_model",
+        "fromTable": "fact_demand",
+        "fromColumn": "model",
+        "toTable": "dim_model",
+        "toColumn": "model",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "fact_backtest_dim_date",
+        "fromTable": "fact_backtest",
+        "fromColumn": "date",
+        "toTable": "dim_date",
+        "toColumn": "date",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "fact_backtest_dim_region",
+        "fromTable": "fact_backtest",
+        "fromColumn": "region_id",
+        "toTable": "dim_region",
+        "toColumn": "region_id",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "fact_backtest_dim_model",
+        "fromTable": "fact_backtest",
+        "fromColumn": "model",
+        "toTable": "dim_model",
+        "toColumn": "model",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "fact_metrics_dim_region",
+        "fromTable": "fact_metrics",
+        "fromColumn": "region_id",
+        "toTable": "dim_region",
+        "toColumn": "region_id",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "fact_metrics_dim_model",
+        "fromTable": "fact_metrics",
+        "fromColumn": "model",
+        "toTable": "dim_model",
+        "toColumn": "model",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "oneDirection"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"SourceFolder\", \"ReadCsv\", \"fact_demand\", \"fact_backtest\", \"fact_metrics\", \"dim_date\", \"dim_region\", \"dim_model\"]"
+      }
+    ]
+  }
+}

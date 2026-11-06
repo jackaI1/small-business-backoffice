@@ -1,0 +1,94 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "variance",
+  "position": {
+    "x": 20,
+    "y": 520,
+    "z": 0,
+    "height": 180,
+    "width": 1240,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_region"
+                    }
+                  },
+                  "Property": "region_name"
+                }
+              },
+              "queryRef": "dim_region.region_name",
+              "nativeQueryRef": "region_name"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_demand"
+                    }
+                  },
+                  "Property": "Matched Actual Tickets"
+                }
+              },
+              "queryRef": "fact_demand.Matched Actual Tickets",
+              "nativeQueryRef": "Matched Actual Tickets"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_demand"
+                    }
+                  },
+                  "Property": "Matched Forecast Tickets"
+                }
+              },
+              "queryRef": "fact_demand.Matched Forecast Tickets",
+              "nativeQueryRef": "Matched Forecast Tickets"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_demand"
+                    }
+                  },
+                  "Property": "Forecast Variance %"
+                }
+              },
+              "queryRef": "fact_demand.Forecast Variance %",
+              "nativeQueryRef": "Forecast Variance %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_demand"
+                    }
+                  },
+                  "Property": "Evaluation WAPE"
+                }
+              },
+              "queryRef": "fact_demand.Evaluation WAPE",
+              "nativeQueryRef": "Evaluation WAPE"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
