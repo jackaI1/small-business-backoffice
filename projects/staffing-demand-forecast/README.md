@@ -49,6 +49,8 @@ The supplied assumptions give peak daily needs of 11 people in Australia, 17 in 
 There are 5 test source files in this copy. No test pass count is claimed here: I have not re-run the project suite as part of this move. This is a source snapshot, and running it on a new machine may need environment-specific setup.
 
 
-Project checks run from this directory through the path-filtered hub workflows: `staffing-demand-forecast-refresh.yml`, `staffing-demand-forecast-ci.yml`.
+Project checks run from this directory through the path-filtered hub workflows: `staffing-demand-forecast-refresh.yml`, (removed workflow).
 
 Generated output omitted: outputs/ (generated output).
+
+The relocated workflow did not complete successfully within the migration batch. Local test sources remain available.
