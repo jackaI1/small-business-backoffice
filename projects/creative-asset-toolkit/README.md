@@ -2,6 +2,8 @@
 
 I built a promotion artwork exporter to learn how the underlying idea works. This is a learning project.
 
+The included basketball event, teams and venue are fictional.
+
 ## Run it
 
 I use Inkscape for the editable drawing and rendering, and GIMP 3 for the final image exports. These are open-source alternatives to Illustrator and Photoshop. Python runs the steps without opening either editor's interface.
