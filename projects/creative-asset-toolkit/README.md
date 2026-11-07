@@ -13,6 +13,8 @@ I use Python 3.11 or newer. On macOS, with [Homebrew](https://brew.sh/) installe
 ```sh
 brew install python
 brew install --cask inkscape gimp
+git clone https://github.com/jackaI1/creative-asset-toolkit.git
+cd creative-asset-toolkit
 "$(brew --prefix)/bin/python3" -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-dev.txt
