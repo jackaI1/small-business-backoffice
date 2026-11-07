@@ -2,6 +2,8 @@
 
 I built a creative brief tracker to learn how the underlying idea works. This is a learning project.
 
+The demo uses two fictional basketball campaigns and three fictional people.
+
 ## Using my own Airtable base
 
 Airtable is an editable set of linked tables. Its REST API lets this Python tool read and update those tables over the web. I can change task status in Airtable, then run the reminder command to read the latest state.
