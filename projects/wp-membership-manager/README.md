@@ -97,7 +97,7 @@ An open means the message's tracking image was requested, not that a person defi
 
 ## Tests and limits
 
-GitHub Actions runs two jobs on every change to this folder. The first installs PHP 8.4, lints every PHP file, and runs 51 PHPUnit tests. Those tests cover membership and receipt rules, Stripe checkout requests, registration holds, refunds, and webhook signature checks using signed fixture files. Stripe's network calls are replaced by a test double in those tests. The second job starts the demo in Docker with WordPress and MariaDB, runs the database integration checks inside WordPress, and drives the admin forms, Mailpit, and the webhook endpoint. The endpoint must refuse an unsigned or forged request and accept a correctly signed event that matches no payment on this site.
+GitHub Actions runs two jobs on every change to this folder. The first installs PHP 8.4, lints every PHP file, and runs 53 PHPUnit tests. Those tests cover membership and receipt rules, Stripe checkout requests, registration holds, refunds, and webhook signature checks using signed fixture files. Stripe's network calls are replaced by a test double in those tests. The second job starts the demo in Docker with WordPress and MariaDB, runs the database integration checks inside WordPress, and drives the admin forms, Mailpit, and the webhook endpoint. The endpoint must refuse an unsigned or forged request and accept a correctly signed event that matches no payment on this site.
 
 Limits I know about:
 
