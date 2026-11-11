@@ -58,6 +58,20 @@ final class StripeGatewayTest extends TestCase {
         $this->expectExceptionMessage('test secret key');
         new StripeGateway('sk_live_example', self::SECRET, new StripeFake());
     }
+    public function testWebhookVerificationWorksWithoutAnApiKeyButCheckoutDoesNot(): void {
+        [$payload, $header] = $this->signedFixture();
+        $gateway = new StripeGateway('', self::SECRET, new StripeFake());
+        self::assertSame('checkout.session.completed', $gateway->verifyEvent($payload, $header, self::NOW)['type']);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('WPMM_STRIPE_SECRET_KEY');
+        $gateway->createCheckoutSession(['mode'=>'payment'], 'abc');
+    }
+    public function testLiveModeEventIsRefusedEvenWithAValidSignature(): void {
+        $payload = str_replace('"livemode": false', '"livemode": true', StripeFake::fixture('checkout-session-completed', ['payment_id'=>'0123456789abcdef01234567','session_id'=>'cs_test_1','amount'=>2500,'payment_status'=>'paid','payment_intent'=>'pi_test_1']));
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Live-mode');
+        $this->gateway()->verifyEvent($payload, StripeFake::signature($payload, self::SECRET, self::NOW), self::NOW);
+    }
     public function testCheckoutRequestUsesFormBodyWithRawBracketNames(): void {
         $http = new StripeFake();
         $gateway = new StripeGateway('sk_test_example', self::SECRET, $http);

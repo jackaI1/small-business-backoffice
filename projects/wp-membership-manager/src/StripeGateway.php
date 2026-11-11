@@ -17,11 +17,13 @@ final class StripeGateway implements CheckoutGateway {
 
     public function __construct(private string $secretKey, private string $webhookSecret, callable $http) {
         // Refuse live keys so this learning project cannot charge real cards by accident.
-        if (!str_starts_with($secretKey, 'sk_test_')) { throw new InvalidArgumentException('Card payments need a Stripe test secret key (sk_test_...) in WPMM_STRIPE_SECRET_KEY.'); }
+        // An empty key is allowed: webhook verification needs only the webhook secret.
+        if ($secretKey !== '' && !str_starts_with($secretKey, 'sk_test_')) { throw new InvalidArgumentException('Use a Stripe test secret key (sk_test_...) in WPMM_STRIPE_SECRET_KEY.'); }
         $this->http = $http;
     }
 
     public function createCheckoutSession(array $params, string $idempotencyKey): array {
+        if ($this->secretKey === '') { throw new InvalidArgumentException('Set WPMM_STRIPE_SECRET_KEY to a Stripe test key (sk_test_...).'); }
         $response = ($this->http)('POST', self::API.'/checkout/sessions', [
             'Authorization' => 'Bearer '.$this->secretKey,
             'Content-Type' => 'application/x-www-form-urlencoded',
@@ -55,6 +57,8 @@ final class StripeGateway implements CheckoutGateway {
         if (!is_array($event) || !is_string($event['type'] ?? null) || !is_array($event['data']['object'] ?? null)) {
             throw new InvalidArgumentException('Stripe event is malformed.');
         }
+        // A test-mode site never applies a live-mode event, even one Stripe signed.
+        if (($event['livemode'] ?? false) !== false) { throw new InvalidArgumentException('Live-mode events are refused in test mode.'); }
         return $event;
     }
 
