@@ -1,0 +1,20 @@
+{
+  "id": "evt_test_refunded",
+  "object": "event",
+  "api_version": "2026-01-01",
+  "created": 1780000000,
+  "type": "charge.refunded",
+  "livemode": false,
+  "data": {
+    "object": {
+      "id": "ch_test_1",
+      "object": "charge",
+      "amount": {{amount}},
+      "amount_refunded": {{amount_refunded}},
+      "currency": "cad",
+      "payment_intent": "{{payment_intent}}",
+      "refunded": {{fully_refunded}},
+      "status": "succeeded"
+    }
+  }
+}

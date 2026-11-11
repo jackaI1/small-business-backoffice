@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WP Membership Manager
- * Description: Association memberships, renewals, event sponsorships and consent-based HTML campaigns.
+ * Description: Association memberships, renewals, event sponsorships, Stripe test-mode card payments and consent-based HTML campaigns.
  * Version: 1.0.0
  * Requires at least: 6.6
  * Requires PHP: 8.2
@@ -12,10 +12,31 @@ if (!defined('ABSPATH')) { exit; }
 require_once __DIR__.'/src/Store.php';
 require_once __DIR__.'/src/Manager.php';
 require_once __DIR__.'/src/WordPressStore.php';
+require_once __DIR__.'/src/CheckoutGateway.php';
+require_once __DIR__.'/src/StripeGateway.php';
+require_once __DIR__.'/src/Checkout.php';
 require_once __DIR__.'/src/Admin.php';
 function wpmm_manager(): \WPMM\Manager {
     global $wpdb;
     return new \WPMM\Manager(new \WPMM\WordPressStore($wpdb), wp_date('Y-m-d'));
+}
+/** Card payments read Stripe test keys from environment variables. Live keys are refused. */
+function wpmm_checkout(): \WPMM\Checkout {
+    $gateway = new \WPMM\StripeGateway((string)getenv('WPMM_STRIPE_SECRET_KEY'), (string)getenv('WPMM_STRIPE_WEBHOOK_SECRET'),
+        function(string $method, string $url, array $headers, string $body): array {
+            $response = wp_remote_request($url, ['method'=>$method, 'headers'=>$headers, 'body'=>$body, 'timeout'=>20]);
+            if (is_wp_error($response)) { throw new \RuntimeException('Stripe could not be reached.'); }
+            return ['status'=>(int)wp_remote_retrieve_response_code($response), 'body'=>(string)wp_remote_retrieve_body($response)];
+        });
+    return new \WPMM\Checkout(wpmm_manager(), $gateway, home_url('/'));
+}
+/** Stripe posts here. The signature is checked before any state changes. */
+function wpmm_stripe_webhook(): void {
+    $payload = (string)file_get_contents('php://input');
+    $signature = is_string($_SERVER['HTTP_STRIPE_SIGNATURE'] ?? null) ? $_SERVER['HTTP_STRIPE_SIGNATURE'] : '';
+    try { $status = wpmm_checkout()->handleWebhook($payload, $signature); }
+    catch (\Throwable) { $status = 503; } // Missing keys or a busy database: ask Stripe to retry.
+    status_header($status); nocache_headers(); exit;
 }
 register_activation_hook(__FILE__, function() { global $wpdb; (new \WPMM\WordPressStore($wpdb))->install(); update_option('wpmm_schema', 1); });
 add_action('plugins_loaded', function() {
@@ -24,6 +45,8 @@ add_action('plugins_loaded', function() {
 add_action('admin_menu', fn()=>add_menu_page('Membership Manager','Membership Manager','manage_options','wpmm',[\WPMM\Admin::class,'render'],'dashicons-groups'));
 add_action('admin_post_wpmm_export_report', [\WPMM\Admin::class,'exportReport']);
 add_action('admin_post_wpmm_save', [\WPMM\Admin::class,'handle']);
+add_action('admin_post_nopriv_wpmm_stripe_webhook', 'wpmm_stripe_webhook');
+add_action('admin_post_wpmm_stripe_webhook', 'wpmm_stripe_webhook');
 // SMTP is opt-in. Normal installations keep their existing wp_mail transport.
 // wp_mail validates From before phpmailer_init; localhost is not a valid mail domain.
 add_filter('wp_mail_from', fn($from)=>getenv('WPMM_DEMO_SMTP') === '1' ? 'association@example.test' : $from);

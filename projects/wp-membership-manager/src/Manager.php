@@ -55,31 +55,44 @@ final class Manager {
     }
     public function renew(string $memberId, string $receipt, string $amount): void {
         $this->store->atomic(function() use ($memberId, $receipt, $amount) {
-            $member = $this->requireRecord('member', $memberId); $receipt = self::id($receipt); $cents = self::cents($amount);
-            if ($old = $this->store->get('renewal', $receipt)) {
-                if ($old['member'] !== $memberId || $old['cents'] !== $cents) { throw new InvalidArgumentException('Receipt already used for a different renewal.'); }
-                return;
-            }
-            $expires = (new \DateTimeImmutable(max($this->today, $member['expires'])))->modify('+1 year')->format('Y-m-d');
-            $this->store->put('renewal', $receipt, ['id'=>$receipt,'member'=>$memberId,'date'=>$this->today,'cents'=>$cents,'expires'=>$expires]);
-            $member['expires'] = $expires; $this->store->put('member', $memberId, $member);
+            $receipt = self::id($receipt); $cents = self::cents($amount);
+            $this->recordRenewal($memberId, $receipt, $cents, 'admin');
         });
+    }
+    /** Shared by manual receipts and paid card renewals. A receipt ID is recorded once. */
+    private function recordRenewal(string $memberId, string $receipt, int $cents, string $source): void {
+        $member = $this->requireRecord('member', $memberId);
+        if ($old = $this->store->get('renewal', $receipt)) {
+            if ($old['member'] !== $memberId || $old['cents'] !== $cents) { throw new InvalidArgumentException('Receipt already used for a different renewal.'); }
+            return;
+        }
+        $expires = (new \DateTimeImmutable(max($this->today, $member['expires'])))->modify('+1 year')->format('Y-m-d');
+        $this->store->put('renewal', $receipt, ['id'=>$receipt,'member'=>$memberId,'date'=>$this->today,'cents'=>$cents,'expires'=>$expires,'source'=>$source,'refunded_cents'=>0]);
+        $member['expires'] = $expires; $this->store->put('member', $memberId, $member);
     }
     public function saveEvent(array $input): void {
         $this->store->atomic(function() use ($input) {
             $id = self::id($input['id'] ?? ''); $capacity = filter_var($input['capacity'] ?? null, FILTER_VALIDATE_INT, ['options'=>['min_range'=>1,'max_range'=>100000]]);
             if ($capacity === false) { throw new InvalidArgumentException('Capacity must be a whole number from 1 to 100000.'); }
             if ($this->registered($id) > $capacity) { throw new InvalidArgumentException('Capacity cannot be below existing registrations.'); }
-            $this->store->put('event', $id, ['id'=>$id,'name'=>self::text($input['name'] ?? '', 'event name'),'date'=>self::date($input['date'] ?? ''),'capacity'=>$capacity]);
+            $fee = trim((string)($input['fee'] ?? '0')); $feeCents = $fee === '' ? 0 : self::cents($fee);
+            if ($feeCents !== 0 && $feeCents < 50) { throw new InvalidArgumentException('Entry fee must be $0 for a free event, or at least $0.50.'); }
+            $this->store->put('event', $id, ['id'=>$id,'name'=>self::text($input['name'] ?? '', 'event name'),'date'=>self::date($input['date'] ?? ''),'capacity'=>$capacity,'fee_cents'=>$feeCents]);
         });
     }
-    private function registered(string $event): int { return count(array_filter($this->store->all('registration'), fn($r)=>$r['event'] === $event)); }
+    private static function registrationKey(string $event, string $member): string { return hash('sha256', "$event:$member"); }
+    /** Pending and confirmed places count against capacity. Released and refunded places do not. */
+    private static function holdsPlace(array $registration): bool { return !in_array($registration['status'] ?? 'confirmed', ['released','refunded'], true); }
+    private function registered(string $event): int {
+        return count(array_filter($this->store->all('registration'), fn($r)=>$r['event'] === $event && self::holdsPlace($r)));
+    }
     public function register(string $eventId, string $memberId): void {
         $this->store->atomic(function() use ($eventId, $memberId) {
-            $event = $this->requireRecord('event', $eventId); $this->requireRecord('member', $memberId); $key = hash('sha256', "$eventId:$memberId");
-            if ($this->store->get('registration', $key)) { return; }
+            $event = $this->requireRecord('event', $eventId); $this->requireRecord('member', $memberId); $key = self::registrationKey($eventId, $memberId);
+            if (($event['fee_cents'] ?? 0) > 0) { throw new InvalidArgumentException('This event has an entry fee. Create a card payment link instead.'); }
+            if ($old = $this->store->get('registration', $key)) { if (self::holdsPlace($old)) { return; } }
             if ($this->registered($eventId) >= $event['capacity']) { throw new InvalidArgumentException('Event is full.'); }
-            $this->store->put('registration', $key, ['id'=>$key,'event'=>$eventId,'member'=>$memberId,'date'=>$this->today]);
+            $this->store->put('registration', $key, ['id'=>$key,'event'=>$eventId,'member'=>$memberId,'date'=>$this->today,'status'=>'confirmed']);
         });
     }
     public function saveSponsor(array $input): void { $this->store->atomic(function() use ($input) { $this->writeSponsor($input); }); }
@@ -89,6 +102,129 @@ final class Manager {
         if ($paid > $amount) { throw new InvalidArgumentException('Paid amount cannot exceed the sponsorship agreement.'); }
         $this->store->put('sponsor', $id, ['id'=>$id,'name'=>self::text($input['name'] ?? '', 'sponsor name'),'event'=>$event['id'],'cents'=>$amount,'paid_cents'=>$paid,'agreement'=>self::text($input['agreement'] ?? '', 'agreement', 2000)]);
     }
+
+    // Card payments. Stripe is called between beginPayment and attachSession, so
+    // this class only stores state; StripeGateway and Checkout own the network calls.
+
+    /** Creates a pending payment and holds the place before Stripe is called. */
+    public function beginPayment(string $kind, string $memberId, ?string $eventId, string $amount): array {
+        return $this->store->atomic(function() use ($kind, $memberId, $eventId, $amount) {
+            $member = $this->requireRecord('member', $memberId); $id = bin2hex(random_bytes(12));
+            if ($kind === 'registration') {
+                $event = $this->requireRecord('event', (string)$eventId);
+                $cents = (int)($event['fee_cents'] ?? 0);
+                if ($cents < 50) { throw new InvalidArgumentException('This event has no entry fee. Register the member directly.'); }
+                $key = self::registrationKey($event['id'], $member['id']);
+                if ($old = $this->store->get('registration', $key)) {
+                    if (self::holdsPlace($old)) { throw new InvalidArgumentException($old['status'] === 'confirmed' ? 'This member already has a place at this event.' : 'A card payment for this place is already open.'); }
+                }
+                if ($this->registered($event['id']) >= $event['capacity']) { throw new InvalidArgumentException('Event is full.'); }
+                $this->store->put('registration', $key, ['id'=>$key,'event'=>$event['id'],'member'=>$member['id'],'date'=>$this->today,'status'=>'pending_payment','payment'=>$id]);
+                $label = 'Event place: '.$event['name'];
+            } elseif ($kind === 'renewal') {
+                $cents = self::cents($amount);
+                if ($cents < 50) { throw new InvalidArgumentException('A card payment must be at least $0.50.'); }
+                $eventId = null; $label = 'Membership renewal';
+            } else { throw new InvalidArgumentException('Unknown payment type.'); }
+            $payment = ['id'=>$id,'kind'=>$kind,'member'=>$member['id'],'event'=>$eventId ? self::id($eventId) : null,'label'=>$label,'cents'=>$cents,'currency'=>'cad','status'=>'pending','session'=>null,'url'=>null,'payment_intent'=>null,'refunded_cents'=>0,'date'=>$this->today];
+            $this->store->put('payment', $id, $payment);
+            return $payment;
+        });
+    }
+    public function attachSession(string $paymentId, string $sessionId, string $url): void {
+        $this->store->atomic(function() use ($paymentId, $sessionId, $url) {
+            $payment = $this->requirePayment($paymentId);
+            $payment['session'] = $sessionId; $payment['url'] = $url;
+            // A fast webhook may already have moved the payment on; keep that status.
+            if ($payment['status'] === 'pending') { $payment['status'] = 'open'; }
+            $this->store->put('payment', $paymentId, $payment);
+        });
+    }
+    /** Releases the hold when Stripe refused to create the session. */
+    public function cancelPayment(string $paymentId): void {
+        $this->store->atomic(function() use ($paymentId) {
+            $payment = $this->requirePayment($paymentId);
+            if (!in_array($payment['status'], ['pending','open'], true)) { return; }
+            $this->closePayment($payment, 'failed');
+        });
+    }
+    private function requirePayment(string $id): array {
+        return $this->store->get('payment', self::id($id)) ?? throw new InvalidArgumentException('Unknown payment.');
+    }
+    /**
+     * Applies a signed Checkout Session event. Every branch is idempotent: a repeated
+     * or late webhook finds the payment in a final state and changes nothing.
+     */
+    public function applyCheckoutSession(string $type, array $session): bool {
+        return $this->store->atomic(function() use ($type, $session) {
+            $paymentId = (string)($session['metadata']['payment_id'] ?? '');
+            if (!preg_match('/^[a-f0-9]{24}$/D', $paymentId)) { return false; }
+            $payment = $this->store->get('payment', $paymentId);
+            if (!$payment) { return false; }
+            if ($payment['session'] !== null && $payment['session'] !== ($session['id'] ?? null)) { throw new InvalidArgumentException('Checkout session does not match its payment.'); }
+            if (in_array($payment['status'], ['paid','refunded','review','expired','failed'], true)) { return true; }
+            if (in_array($type, ['checkout.session.completed','checkout.session.async_payment_succeeded'], true)) {
+                if (($session['payment_status'] ?? '') !== 'paid') { $payment['status'] = 'processing'; $this->store->put('payment', $paymentId, $payment); return true; }
+                $payment['payment_intent'] = is_string($session['payment_intent'] ?? null) ? $session['payment_intent'] : null;
+                if (($session['amount_total'] ?? null) !== $payment['cents'] || ($session['currency'] ?? '') !== 'cad') {
+                    $payment['status'] = 'review'; $this->store->put('payment', $paymentId, $payment); return true;
+                }
+                if ($payment['kind'] === 'registration') {
+                    if (!$this->confirmPlace($payment)) { $payment['status'] = 'review'; $this->store->put('payment', $paymentId, $payment); return true; }
+                } else {
+                    // Receipt ID is derived from the payment, so a replayed webhook extends the membership once.
+                    $this->recordRenewal($payment['member'], 'stripe-'.$paymentId, $payment['cents'], 'stripe');
+                }
+                $payment['status'] = 'paid'; $this->store->put('payment', $paymentId, $payment);
+                return true;
+            }
+            if (in_array($type, ['checkout.session.expired','checkout.session.async_payment_failed'], true)) {
+                $this->closePayment($payment, $type === 'checkout.session.expired' ? 'expired' : 'failed');
+                return true;
+            }
+            return true;
+        });
+    }
+    private function closePayment(array $payment, string $status): void {
+        $payment['status'] = $status; $this->store->put('payment', $payment['id'], $payment);
+        if ($payment['kind'] !== 'registration') { return; }
+        $key = self::registrationKey($payment['event'], $payment['member']); $place = $this->store->get('registration', $key);
+        if ($place && ($place['payment'] ?? null) === $payment['id'] && $place['status'] === 'pending_payment') {
+            $place['status'] = 'released'; $this->store->put('registration', $key, $place);
+        }
+    }
+    private function confirmPlace(array $payment): bool {
+        $key = self::registrationKey($payment['event'], $payment['member']); $place = $this->store->get('registration', $key);
+        if (!$place || ($place['payment'] ?? null) !== $payment['id'] || $place['status'] !== 'pending_payment') { return false; }
+        $place['status'] = 'confirmed'; $this->store->put('registration', $key, $place);
+        return true;
+    }
+    /** Charge refunds carry cumulative amount_refunded, so applying the same event twice changes nothing. */
+    public function applyRefund(array $charge): bool {
+        return $this->store->atomic(function() use ($charge) {
+            $intent = (string)($charge['payment_intent'] ?? '');
+            if (!preg_match('/^pi_[A-Za-z0-9_]+$/D', $intent)) { return false; }
+            $payment = null;
+            foreach ($this->store->all('payment') as $candidate) { if (($candidate['payment_intent'] ?? null) === $intent) { $payment = $candidate; break; } }
+            if (!$payment) { return false; }
+            $refunded = (int)($charge['amount_refunded'] ?? 0);
+            if ($refunded < 0 || $refunded > $payment['cents']) { throw new InvalidArgumentException('Refund amount is outside the payment.'); }
+            $payment['refunded_cents'] = $refunded;
+            if ($refunded === $payment['cents']) {
+                $payment['status'] = 'refunded';
+                if ($payment['kind'] === 'registration') {
+                    $key = self::registrationKey($payment['event'], $payment['member']); $place = $this->store->get('registration', $key);
+                    if ($place && ($place['payment'] ?? null) === $payment['id']) { $place['status'] = 'refunded'; $this->store->put('registration', $key, $place); }
+                }
+            }
+            if ($payment['kind'] === 'renewal' && ($renewal = $this->store->get('renewal', 'stripe-'.$payment['id']))) {
+                $renewal['refunded_cents'] = $refunded; $this->store->put('renewal', $renewal['id'], $renewal);
+            }
+            $this->store->put('payment', $payment['id'], $payment);
+            return true;
+        });
+    }
+
     public function segment(string $segment): array {
         if (!in_array($segment, ['all','active','due','expired'], true)) { throw new InvalidArgumentException('Unknown campaign segment.'); }
         $soon = (new \DateTimeImmutable($this->today))->modify('+30 days')->format('Y-m-d');
@@ -210,11 +346,15 @@ final class Manager {
     }
     public function report(): array {
         $members = $this->store->all('member'); $renewals = $this->store->all('renewal'); $sponsors = $this->store->all('sponsor'); $deliveries = $this->store->all('delivery');
+        $registrations = $this->store->all('registration'); $payments = $this->store->all('payment');
         $pledged = array_sum(array_column($sponsors, 'cents')); $paid = array_sum(array_column($sponsors, 'paid_cents'));
+        $netRenewals = array_sum(array_map(fn($r)=>$r['cents'] - ($r['refunded_cents'] ?? 0), $renewals));
+        $eventFees = array_sum(array_map(fn($p)=>$p['cents'] - $p['refunded_cents'], array_filter($payments, fn($p)=>$p['kind'] === 'registration' && $p['status'] === 'paid')));
         return ['members'=>count($members),'active'=>count(array_filter($members, fn($m)=>$m['expires'] >= $this->today)),
             'due'=>count(array_filter($members, fn($m)=>$m['expires'] >= $this->today && $m['expires'] <= (new \DateTimeImmutable($this->today))->modify('+30 days')->format('Y-m-d'))),
-            'renewals'=>count($renewals),'renewed_members'=>count(array_unique(array_column($renewals, 'member'))),'renewal_cents'=>array_sum(array_column($renewals,'cents')),
-            'registrations'=>count($this->store->all('registration')),'sponsor_cents'=>$pledged,'sponsor_paid_cents'=>$paid,'sponsor_outstanding_cents'=>$pledged-$paid,
+            'renewals'=>count($renewals),'renewed_members'=>count(array_unique(array_column($renewals, 'member'))),'renewal_cents'=>$netRenewals,
+            'registrations'=>count(array_filter($registrations, fn($r)=>self::holdsPlace($r))),'event_fees_cents'=>$eventFees,
+            'sponsor_cents'=>$pledged,'sponsor_paid_cents'=>$paid,'sponsor_outstanding_cents'=>$pledged-$paid,
             'sent'=>count(array_filter($deliveries,fn($d)=>$d['status'] === 'sent')),'opened'=>count(array_filter($deliveries,fn($d)=>$d['opened'])),
             'failed'=>count(array_filter($deliveries,fn($d)=>$d['status'] === 'failed'))];
     }

@@ -24,6 +24,8 @@ services:
       WORDPRESS_DB_PASSWORD: local-demo-only
       WORDPRESS_DB_NAME: wordpress
       WPMM_DEMO_SMTP: '1'
+      WPMM_STRIPE_SECRET_KEY: ${WPMM_STRIPE_SECRET_KEY:-}
+      WPMM_STRIPE_WEBHOOK_SECRET: ${WPMM_STRIPE_WEBHOOK_SECRET:-whsec_local_demo_only}
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_ENVIRONMENT_TYPE', 'local');
         define('DISALLOW_FILE_EDIT', true);

@@ -16,4 +16,4 @@ The dashboard follows WordPress admin conventions: labelled form controls, table
 
 ## Boundaries
 
-Campaigns use explicit email permission and include unsubscribe confirmation links. Payments are recorded manually, and sponsorship agreements store benefits and amounts; the plugin does not charge cards or collect signatures. The README explains setup, everyday use, tests and operational limits.
+Campaigns use explicit email permission and include unsubscribe confirmation links. Payments can be recorded manually or taken by card through Stripe's hosted test-mode checkout: an admin creates a payment link, and the place or renewal is confirmed only by a signed Stripe webhook. Sponsorship agreements store benefits and amounts; the plugin does not collect signatures. The README explains setup, everyday use, tests and operational limits.

@@ -115,4 +115,23 @@ page = upload_sample('salesforce-opportunities.csv')
 check('1 report rows imported' in page and '$4,250.00' in page and '$2,500.00' in page, 'Opportunity export updates dashboard totals')
 page = upload_sample('salesforce-opportunities.csv')
 check('$4,250.00' in page and '$6,250.00' not in page, 'Repeated opportunity import is an update')
+# Stripe webhook endpoint: unsigned requests are refused; a correctly signed event for a payment this site does not hold is acknowledged and changes nothing.
+import hashlib, hmac, time
+def webhook(body, signature=None):
+    headers = {'Content-Type': 'application/json'}
+    if signature is not None:
+        headers['Stripe-Signature'] = signature
+    hook = urllib.request.Request(BASE+'/wp-admin/admin-post.php?action=wpmm_stripe_webhook', body.encode(), headers)
+    try:
+        with urllib.request.build_opener().open(hook, timeout=20) as response:
+            return response.status
+    except urllib.error.HTTPError as error:
+        return error.code
+secret = os.environ.get('WPMM_STRIPE_WEBHOOK_SECRET', 'whsec_local_demo_only')
+event = json.dumps({'id':'evt_smoke','object':'event','type':'checkout.session.expired','data':{'object':{'id':'cs_smoke','object':'checkout.session','metadata':{'payment_id':'000000000000000000000000'},'payment_status':'unpaid','status':'expired'}}})
+stamp = int(time.time())
+good = f"t={stamp},v1=" + hmac.new(secret.encode(), f"{stamp}.{event}".encode(), hashlib.sha256).hexdigest()
+check(webhook(event) == 400, 'Webhook without a Stripe signature rejected')
+check(webhook(event, f"t={stamp},v1=0000") == 400, 'Webhook with a forged signature rejected')
+check(webhook(event, good) == 200, 'Correctly signed webhook acknowledged')
 print(f'{checks} HTTP/Mailpit checks passed.')
