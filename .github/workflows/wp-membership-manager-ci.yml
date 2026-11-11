@@ -1,0 +1,56 @@
+name: wp-membership-manager / CI
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - projects/wp-membership-manager/**
+    - .github/workflows/wp-membership-manager-ci.yml
+  pull_request:
+    paths:
+    - projects/wp-membership-manager/**
+    - .github/workflows/wp-membership-manager-ci.yml
+  workflow_dispatch: {}
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  unit:
+    name: PHP lint and unit tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: projects/wp-membership-manager
+    steps:
+    - uses: actions/checkout@v4
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.4'
+        tools: composer:v2
+    - name: Install dependencies
+      run: composer install --no-interaction --prefer-dist --no-progress
+    - name: Lint PHP sources and tests
+      run: composer lint
+    - name: Run PHPUnit (membership rules, card payments, Stripe signatures)
+      run: composer test
+  demo:
+    name: WordPress and MariaDB demo with Stripe webhook checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: projects/wp-membership-manager
+    steps:
+    - uses: actions/checkout@v4
+    - name: Start the demo (WordPress, MariaDB and Mailpit, test-mode keys only)
+      run: bash demo/setup.sh
+    - name: Database integration checks inside WordPress
+      run: docker compose run --rm cli eval-file wp-content/plugins/wp-membership-manager/tests/integration.php
+    - name: Browser-level checks through the admin forms, Mailpit and the Stripe webhook endpoint
+      run: python3 tests/http_smoke.py
+    - name: Stop the demo and remove its synthetic database
+      if: always()
+      run: docker compose down -v --remove-orphans

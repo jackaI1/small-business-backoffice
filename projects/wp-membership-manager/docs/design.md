@@ -17,3 +17,7 @@ Reports are all-time snapshots. Renewal totals sum the receipt ledger. Sponsorsh
 `demo/setup.sh` installs WordPress, activates the plugin and seeds an empty association. Running it again preserves existing records. `tests/integration.php` creates its own temporary table and drops it in a `finally` block. `tests/http_smoke.py` changes only the synthetic demo records and checks the actual Mailpit inbox. Run it once on a fresh demo. CI always runs `docker compose down -v --remove-orphans`, including failure paths.
 
 A manual demo stays running for inspection until `docker compose down` is called. `-v` also removes the demo database and WordPress volume; back up anything wanted first. The setup does not start or restart a Docker engine, kill other processes, or open browser tabs. A failed local setup may leave its own containers available for diagnosis; use the same cleanup command when finished.
+
+## Card payments
+
+Stripe Checkout is used in test mode; see [card payments](payments.md) for the state machine, webhook events, refunds and failure handling. Three decisions matter most. The plugin never sees card numbers. A place or renewal changes only after a signature-verified webhook. Renewals reuse the receipt ledger with a payment-derived receipt ID, so replays cannot extend a membership twice. The HTTP client is injected, which keeps the runtime free of a Composer dependency and lets tests check real request bodies and real signatures without network access.

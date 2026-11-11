@@ -1,0 +1,22 @@
+{
+  "id": "evt_test_completed",
+  "object": "event",
+  "api_version": "2026-01-01",
+  "created": 1780000000,
+  "type": "checkout.session.completed",
+  "livemode": false,
+  "data": {
+    "object": {
+      "id": "{{session_id}}",
+      "object": "checkout.session",
+      "amount_total": {{amount}},
+      "currency": "cad",
+      "client_reference_id": "{{payment_id}}",
+      "metadata": {"payment_id": "{{payment_id}}"},
+      "mode": "payment",
+      "payment_intent": "{{payment_intent}}",
+      "payment_status": "{{payment_status}}",
+      "status": "complete"
+    }
+  }
+}

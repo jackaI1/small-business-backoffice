@@ -1,0 +1,21 @@
+{
+  "id": "evt_test_expired",
+  "object": "event",
+  "api_version": "2026-01-01",
+  "created": 1780000000,
+  "type": "checkout.session.expired",
+  "livemode": false,
+  "data": {
+    "object": {
+      "id": "{{session_id}}",
+      "object": "checkout.session",
+      "amount_total": {{amount}},
+      "currency": "cad",
+      "metadata": {"payment_id": "{{payment_id}}"},
+      "mode": "payment",
+      "payment_intent": null,
+      "payment_status": "unpaid",
+      "status": "expired"
+    }
+  }
+}
