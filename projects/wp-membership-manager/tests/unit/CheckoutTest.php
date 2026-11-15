@@ -169,6 +169,28 @@ final class CheckoutTest extends TestCase {
         try { $this->checkout->renewalLink('m1', '0.40'); self::fail('Sub-minimum renewal accepted'); } catch (InvalidArgumentException $e) { self::assertStringContainsString('at least $0.50', $e->getMessage()); }
         self::assertCount($requests, $this->stripe->requests); // No Stripe call was made for rejected requests.
     }
+    public function testHoldCountsAgainstCapacityWhileTheSessionIsStillOpen(): void {
+        $this->checkout->registrationLink('e1', 'm1');
+        self::assertMatchesRegularExpression('/expires_at=\d+/', $this->stripe->requests[0]['body']);
+        // Just before the hour is up, and inside the grace period, the seat is still held.
+        foreach ([time() + 3000, time() + 3600 + 600] as $later) {
+            $checkout = new Checkout(new Manager($this->store, '2026-06-01', $later), new StripeGateway('sk_test_example', self::SECRET, $this->stripe), 'https://club.example.test/');
+            try { $checkout->registrationLink('e1', 'm2'); self::fail('The held place was offered twice.'); }
+            catch (\InvalidArgumentException $e) { self::assertSame('Event is full.', $e->getMessage()); }
+        }
+    }
+    public function testStaleHoldIsReleasedAfterSessionAndGraceWithoutAnExpiryWebhook(): void {
+        $this->checkout->registrationLink('e1', 'm1');
+        // Stripe's expiry webhook never arrives. The next admin page load releases the seat.
+        $afterGrace = new Manager($this->store, '2026-06-01', time() + 3600 + 900 + 5);
+        self::assertSame(1, $afterGrace->expireStaleHolds());
+        self::assertSame('released', $this->place()['status']);
+        self::assertSame('expired', $this->payment($this->paymentId())['status']);
+        self::assertSame(0, $afterGrace->report()['registrations']);
+        // The freed seat goes to the next member.
+        $next = new Checkout($afterGrace, new StripeGateway('sk_test_example', self::SECRET, $this->stripe), 'https://club.example.test/');
+        self::assertSame('https://checkout.stripe.test/c/2', $next->registrationLink('e1', 'm2'));
+    }
     public function testEventFeeValidationRejectsSubMinimumAmounts(): void {
         $this->expectException(InvalidArgumentException::class);
         $this->app->saveEvent(['id'=>'e9','name'=>'Tiny','date'=>'2026-07-02','capacity'=>5,'fee'=>'0.40']);
