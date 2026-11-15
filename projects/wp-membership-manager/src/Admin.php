@@ -72,6 +72,8 @@ final class Admin {
         $configured = str_starts_with((string)getenv('WPMM_STRIPE_SECRET_KEY'), 'sk_test_') && (string)getenv('WPMM_STRIPE_WEBHOOK_SECRET') !== '';
         echo '<h2>Card payments (Stripe test mode)</h2>';
         if (!$configured) { echo '<p><strong>Card payments are off.</strong> Set WPMM_STRIPE_SECRET_KEY to a test key (sk_test_...) and WPMM_STRIPE_WEBHOOK_SECRET to the webhook signing secret. See the README.</p>'; }
+        // Releases holds whose checkout has expired without an expiry webhook. A busy lock is retried on the next page load.
+        try { $app->expireStaleHolds(); } catch (\RuntimeException) {}
         $payments = array_reverse($app->records('payment'));
         echo '<p>A place or renewal is only confirmed after Stripe sends a signed webhook. Expired or failed checkouts release the place. Refunds are recorded automatically; a refunded renewal does not shorten the membership.</p>';
         foreach ($payments as $payment) {

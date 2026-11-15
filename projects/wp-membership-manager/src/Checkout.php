@@ -36,8 +36,8 @@ final class Checkout {
             'payment_intent_data' => ['metadata'=>['payment_id'=>$payment['id']]],
             'success_url' => $this->returnUrl.'?wpmm_payment=success',
             'cancel_url' => $this->returnUrl.'?wpmm_payment=cancelled',
-            // Stripe accepts 30 minutes to 24 hours. An hour keeps unpaid holds short.
-            'expires_at' => time() + 3600,
+            // The same expiry time as the local hold, so Stripe and the site agree.
+            'expires_at' => $payment['expires_at'],
         ];
     }
 

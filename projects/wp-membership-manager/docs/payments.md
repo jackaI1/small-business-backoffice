@@ -38,7 +38,7 @@ Final states (`paid`, `refunded`, `review`, `expired`, `failed`) ignore later ev
 
 ## Registration holds
 
-A paid event place is stored as a registration with status `pending_payment` when the link is created. Pending and confirmed places count against capacity. The place becomes `confirmed` on a paid webhook, and `released` when the session expires or fails. A full refund sets it to `refunded`, which also frees the place. A session expires one hour after creation, so unpaid holds do not stay open long. If Stripe never delivers the expiry webhook, the hold stays until the event is resent. The Card payments table shows each open payment.
+A paid event place is stored as a registration with status `pending_payment` when the link is created. Pending and confirmed places count against capacity. The place becomes `confirmed` on a paid webhook, and `released` when the session expires or fails. A full refund sets it to `refunded`, which also frees the place. The hold and the Stripe session share one expiry time, one hour after creation, so unpaid holds do not stay open long. If Stripe never delivers the expiry webhook, the hold is released by `Manager::expireStaleHolds()` once it is 15 minutes past expiry. That runs when the Card payments table loads and before each new place is held. The 15 minute grace covers a payment Stripe accepted just before expiry whose webhook arrives late. A payment confirmed after the hold is released is not applied; the Stripe dashboard shows it, and the administrator handles it by hand. Paid and processing payments are never released this way. The Card payments table shows each open payment.
 
 ## Renewals and the receipt ledger
 

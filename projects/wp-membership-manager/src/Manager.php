@@ -4,7 +4,14 @@ namespace WPMM;
 use InvalidArgumentException;
 
 final class Manager {
-    public function __construct(private Store $store, private string $today) { self::date($today); }
+    /** Stripe Checkout sessions last one hour here. Stripe accepts 30 minutes to 24 hours. */
+    private const SESSION_SECONDS = 3600;
+    /** A payment Stripe accepted just before expiry may confirm late, so holds wait this long past expiry. */
+    private const STALE_GRACE_SECONDS = 900;
+
+    /** $now is the Unix time used for card holds; tests pass a fixed value to move the clock. */
+    public function __construct(private Store $store, private string $today, private ?int $now = null) { self::date($today); }
+    private function clock(): int { return $this->now ?? time(); }
     private static function text(mixed $value, string $label, int $max = 200): string {
         if (!is_scalar($value)) { throw new InvalidArgumentException("Invalid $label."); }
         $value = trim((string)$value);
@@ -109,6 +116,7 @@ final class Manager {
     /** Creates a pending payment and holds the place before Stripe is called. */
     public function beginPayment(string $kind, string $memberId, ?string $eventId, string $amount): array {
         return $this->store->atomic(function() use ($kind, $memberId, $eventId, $amount) {
+            $this->closeStaleHolds(); // Free seats first, so the capacity check below is accurate.
             $member = $this->requireRecord('member', $memberId); $id = bin2hex(random_bytes(12));
             if ($kind === 'registration') {
                 $event = $this->requireRecord('event', (string)$eventId);
@@ -126,7 +134,7 @@ final class Manager {
                 if ($cents < 50) { throw new InvalidArgumentException('A card payment must be at least $0.50.'); }
                 $eventId = null; $label = 'Membership renewal';
             } else { throw new InvalidArgumentException('Unknown payment type.'); }
-            $payment = ['id'=>$id,'kind'=>$kind,'member'=>$member['id'],'event'=>$eventId ? self::id($eventId) : null,'label'=>$label,'cents'=>$cents,'currency'=>'cad','status'=>'pending','session'=>null,'url'=>null,'payment_intent'=>null,'refunded_cents'=>0,'date'=>$this->today];
+            $payment = ['id'=>$id,'kind'=>$kind,'member'=>$member['id'],'event'=>$eventId ? self::id($eventId) : null,'label'=>$label,'cents'=>$cents,'currency'=>'cad','status'=>'pending','session'=>null,'url'=>null,'payment_intent'=>null,'refunded_cents'=>0,'date'=>$this->today,'expires_at'=>$this->clock() + self::SESSION_SECONDS];
             $this->store->put('payment', $id, $payment);
             return $payment;
         });
@@ -147,6 +155,22 @@ final class Manager {
             if (!in_array($payment['status'], ['pending','open'], true)) { return; }
             $this->closePayment($payment, 'failed');
         });
+    }
+    /**
+     * Releases card holds whose checkout ended without an expiry webhook. Only unpaid
+     * payments are touched; a processing or paid payment is never swept.
+     */
+    public function expireStaleHolds(): int {
+        return $this->store->atomic(fn() => $this->closeStaleHolds());
+    }
+    private function closeStaleHolds(): int {
+        $closed = 0;
+        foreach ($this->store->all('payment') as $payment) {
+            if (!in_array($payment['status'], ['pending','open'], true) || !isset($payment['expires_at'])) { continue; }
+            if ($payment['expires_at'] + self::STALE_GRACE_SECONDS > $this->clock()) { continue; }
+            $this->closePayment($payment, 'expired'); ++$closed;
+        }
+        return $closed;
     }
     private function requirePayment(string $id): array {
         return $this->store->get('payment', self::id($id)) ?? throw new InvalidArgumentException('Unknown payment.');
